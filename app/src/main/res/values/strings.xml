@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Spielbögen-Manager</string>
+    <string name="app_subtitle">Verwalte deine Würfelspiel-Bögen</string>
+
+    <!-- Activity titles -->
+    <string name="title_templates">Vorlagen</string>
+    <string name="title_select_template">Vorlage auswählen</string>
+    <string name="title_game_sheet">Spielbogen</string>
+    <string name="title_hall_of_fame">Hall of Fame</string>
+    <string name="title_hall_of_fame_view">Abgeschlossenes Spiel</string>
+
+    <!-- Main menu buttons -->
+    <string name="btn_manage_templates">Vorlagen verwalten</string>
+    <string name="btn_start_game">Spiel starten</string>
+    <string name="btn_hall_of_fame">Hall of Fame</string>
+
+    <!-- Template management -->
+    <string name="btn_add_template">Vorlage hinzufügen</string>
+    <string name="btn_delete">Löschen</string>
+    <string name="btn_save">Speichern</string>
+    <string name="dialog_add_template_title">Vorlage hinzufügen</string>
+    <string name="dialog_template_name_title">Name der Vorlage</string>
+    <string name="hint_template_name">Name eingeben…</string>
+    <string name="default_template_name">Vorlage</string>
+    <string name="option_take_photo">Foto aufnehmen</string>
+    <string name="option_from_gallery">Aus Galerie auswählen</string>
+    <string name="msg_template_saved">Vorlage gespeichert</string>
+    <string name="msg_template_save_error">Fehler beim Speichern der Vorlage</string>
+    <string name="msg_template_deleted">Vorlage gelöscht</string>
+    <string name="dialog_delete_template_title">Vorlage löschen?</string>
+    <string name="dialog_delete_template_message">Möchtest du die Vorlage „%s" wirklich löschen?</string>
+    <string name="template_thumbnail_desc">Vorschaubild</string>
+    <string name="empty_templates">Noch keine Vorlagen vorhanden.\n\nTippe auf + um eine Vorlage hinzuzufügen.</string>
+
+    <!-- Game sheet dialog -->
+    <string name="dialog_existing_sheet_title">Bestehendes Spiel gefunden</string>
+    <string name="dialog_existing_sheet_message">Es existiert bereits ein angefangener Spielbogen für diese Vorlage. Möchtest du das bestehende Spiel fortsetzen oder ein neues Spiel starten?</string>
+    <string name="btn_continue_sheet">Fortsetzen</string>
+    <string name="btn_new_sheet">Neues Spiel</string>
+
+    <!-- Drawing toolbar -->
+    <string name="btn_pick_color">Farbe wählen</string>
+    <string name="label_width">Breite:</string>
+    <string name="btn_undo">Rückgängig</string>
+    <string name="btn_clear">Alles löschen</string>
+    <string name="dialog_clear_title">Zeichnung löschen?</string>
+    <string name="dialog_clear_message">Möchtest du die gesamte Zeichnung löschen?</string>
+    <string name="template_background_desc">Spielvorlage</string>
+
+    <!-- Game sheet menu -->
+    <string name="action_save">Zwischenstand speichern</string>
+    <string name="action_finish_game">Spiel beenden</string>
+    <string name="msg_sheet_saved">Zwischenstand gespeichert</string>
+
+    <!-- Hall of Fame -->
+    <string name="dialog_finish_game_title">Spiel beenden</string>
+    <string name="dialog_finish_game_message">Gib dem Spiel einen Namen und speichere es in der Hall of Fame.</string>
+    <string name="hint_game_name">Spielname eingeben…</string>
+    <string name="btn_save_to_hof">In Hall of Fame speichern</string>
+    <string name="msg_saved_to_hof">Spiel in der Hall of Fame gespeichert!</string>
+    <string name="empty_hall_of_fame">Die Hall of Fame ist noch leer.\n\nBeende ein Spiel, um es hier zu speichern.</string>
+    <string name="label_game_info">Vorlage: %1$s · Abgeschlossen: %2$s</string>
+    <string name="dialog_delete_hof_title">Eintrag löschen?</string>
+    <string name="dialog_delete_hof_message">Möchtest du „%s" aus der Hall of Fame löschen?</string>
+
+    <!-- Color picker -->
+    <string name="color_picker_title">Stift anpassen</string>
+    <string name="label_pen_color">Farbe</string>
+    <string name="label_pen_width">Strichbreite</string>
+</resources>
