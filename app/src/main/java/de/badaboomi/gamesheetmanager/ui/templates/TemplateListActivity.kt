@@ -3,6 +3,7 @@ package de.badaboomi.gamesheetmanager.ui.templates
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -10,6 +11,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import de.badaboomi.gamesheetmanager.R
+import de.badaboomi.gamesheetmanager.data.GameSheet
 import de.badaboomi.gamesheetmanager.data.Template
 import de.badaboomi.gamesheetmanager.databinding.ActivityTemplateListBinding
 import de.badaboomi.gamesheetmanager.repository.GameSheetRepository
@@ -126,7 +128,7 @@ class TemplateListActivity : AppCompatActivity() {
     }
 
     private fun startNewGameSheet(template: Template) {
-        val newSheet = de.badaboomi.gamesheetmanager.data.GameSheet(
+        val newSheet = GameSheet(
             templateId = template.id,
             templateName = template.name,
             templateImagePath = template.imagePath

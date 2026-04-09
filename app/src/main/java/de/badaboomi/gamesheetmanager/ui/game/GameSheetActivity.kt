@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import de.badaboomi.gamesheetmanager.R
+import de.badaboomi.gamesheetmanager.data.GameSheet
 import de.badaboomi.gamesheetmanager.data.HallOfFameEntry
 import de.badaboomi.gamesheetmanager.databinding.ActivityGameSheetBinding
 import de.badaboomi.gamesheetmanager.repository.GameSheetRepository
