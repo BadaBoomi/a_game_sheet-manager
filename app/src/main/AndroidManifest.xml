@@ -37,8 +37,7 @@
         <activity
             android:name=".ui.game.GameSheetActivity"
             android:exported="false"
-            android:label="@string/title_game_sheet"
-            android:screenOrientation="landscape" />
+            android:label="@string/title_game_sheet" />
 
         <activity
             android:name=".ui.halloffame.HallOfFameActivity"
