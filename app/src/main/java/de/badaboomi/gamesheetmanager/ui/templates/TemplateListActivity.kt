@@ -1,5 +1,6 @@
 package de.badaboomi.gamesheetmanager.ui.templates
 
+import android.Manifest
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -9,6 +10,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import de.badaboomi.gamesheetmanager.R
 import de.badaboomi.gamesheetmanager.data.GameSheet
@@ -41,6 +43,20 @@ class TemplateListActivity : AppCompatActivity() {
     private var mode = MODE_MANAGE
     private var cameraImageFile: File? = null
 
+    private val permissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            launchCamera()
+        } else {
+            Toast.makeText(
+                this,
+                R.string.msg_camera_permission_denied,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
     private val galleryLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
@@ -50,13 +66,19 @@ class TemplateListActivity : AppCompatActivity() {
     private val cameraLauncher = registerForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { success ->
-        if (success) {
-            cameraImageFile?.let { file ->
-                if (file.exists()) {
-                    handleImageSelected(Uri.fromFile(file))
-                } else {
-                    Toast.makeText(this, R.string.msg_photo_failed, Toast.LENGTH_SHORT).show()
-                }
+        if (success && cameraImageFile != null) {
+            val file = cameraImageFile!!
+            if (file.exists() && file.length() > 0) {
+                // Foto wurde erfolgreich gespeichert, verwende den FileProvider-URI
+                val uri = FileProvider.getUriForFile(
+                    this,
+                    "${packageName}.fileprovider",
+                    file
+                )
+                handleImageSelected(uri)
+            } else {
+                Toast.makeText(this, R.string.msg_photo_failed, Toast.LENGTH_SHORT).show()
+                file.delete()
             }
         } else {
             Toast.makeText(this, R.string.msg_photo_cancelled, Toast.LENGTH_SHORT).show()
@@ -187,6 +209,16 @@ class TemplateListActivity : AppCompatActivity() {
     }
 
     private fun takePhoto() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+            == android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) {
+            launchCamera()
+        } else {
+            permissionLauncher.launch(Manifest.permission.CAMERA)
+        }
+    }
+
+    private fun launchCamera() {
         cameraImageFile = FileUtils.createTemplateImageFile(this)
         val uri = FileProvider.getUriForFile(
             this,

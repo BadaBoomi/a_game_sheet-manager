@@ -30,6 +30,7 @@
     <string name="msg_template_deleted">Vorlage gelöscht</string>
     <string name="msg_photo_failed">Fehler: Foto konnte nicht gespeichert werden</string>
     <string name="msg_photo_cancelled">Foto abgebrochen</string>
+    <string name="msg_camera_permission_denied">Kamera-Berechtigung verweigert. Du kannst die Berechtigung in den App-Einstellungen ändern.</string>
     <string name="dialog_delete_template_title">Vorlage löschen?</string>
     <string name="dialog_delete_template_message">Möchtest du die Vorlage „%s" wirklich löschen?</string>
     <string name="template_thumbnail_desc">Vorschaubild</string>
