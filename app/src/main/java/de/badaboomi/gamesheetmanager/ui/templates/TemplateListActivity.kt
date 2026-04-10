@@ -40,6 +40,10 @@ class TemplateListActivity : AppCompatActivity() {
     private var mode = MODE_MANAGE
     private var cameraImageFile: File? = null
 
+    companion object {
+        private const val SAVED_CAMERA_FILE_PATH = "camera_file_path"
+    }
+
     private val galleryLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
@@ -51,8 +55,14 @@ class TemplateListActivity : AppCompatActivity() {
     ) { success ->
         if (success) {
             cameraImageFile?.let { file ->
-                handleImageSelected(Uri.fromFile(file))
+                if (file.exists()) {
+                    handleImageSelected(Uri.fromFile(file))
+                } else {
+                    Toast.makeText(this, R.string.msg_photo_failed, Toast.LENGTH_SHORT).show()
+                }
             }
+        } else {
+            Toast.makeText(this, R.string.msg_photo_cancelled, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -62,6 +72,17 @@ class TemplateListActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        // Restore camera file path if activity was recreated
+        if (savedInstanceState != null) {
+            val savedPath = savedInstanceState.getString(SAVED_CAMERA_FILE_PATH)
+            if (savedPath != null) {
+                val file = File(savedPath)
+                if (file.exists()) {
+                    cameraImageFile = file
+                }
+            }
+        }
 
         mode = intent.getStringExtra(EXTRA_MODE) ?: MODE_MANAGE
         templateRepository = TemplateRepository(this)
@@ -78,6 +99,14 @@ class TemplateListActivity : AppCompatActivity() {
             binding.fabAddTemplate.setOnClickListener { showAddTemplateDialog() }
         } else {
             binding.fabAddTemplate.visibility = View.GONE
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        // Save camera file path in case the activity is recreated
+        cameraImageFile?.let {
+            outState.putString(SAVED_CAMERA_FILE_PATH, it.absolutePath)
         }
     }
 

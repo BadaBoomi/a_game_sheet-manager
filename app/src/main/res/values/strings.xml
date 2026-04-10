@@ -28,6 +28,8 @@
     <string name="msg_template_saved">Vorlage gespeichert</string>
     <string name="msg_template_save_error">Fehler beim Speichern der Vorlage</string>
     <string name="msg_template_deleted">Vorlage gelöscht</string>
+    <string name="msg_photo_failed">Fehler: Foto konnte nicht gespeichert werden</string>
+    <string name="msg_photo_cancelled">Foto abgebrochen</string>
     <string name="dialog_delete_template_title">Vorlage löschen?</string>
     <string name="dialog_delete_template_message">Möchtest du die Vorlage „%s" wirklich löschen?</string>
     <string name="template_thumbnail_desc">Vorschaubild</string>
@@ -41,6 +43,7 @@
 
     <!-- Drawing toolbar -->
     <string name="btn_pick_color">Farbe wählen</string>
+    <string name="btn_toggle_toolbar">Controls ein-/ausblenden</string>
     <string name="label_width">Breite:</string>
     <string name="btn_undo">Rückgängig</string>
     <string name="btn_clear">Alles löschen</string>

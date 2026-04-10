@@ -32,6 +32,7 @@ class GameSheetActivity : AppCompatActivity() {
     private lateinit var hallOfFameRepository: HallOfFameRepository
     private var currentSheet: GameSheet? = null
     private var sheetId: Long = -1
+    private var toolbarControlsVisible = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,6 +74,11 @@ class GameSheetActivity : AppCompatActivity() {
     }
 
     private fun setupToolbarButtons() {
+        // Toggle toolbar button
+        binding.btnToggleToolbar.setOnClickListener {
+            toggleToolbarControls()
+        }
+
         // Color picker button
         binding.btnPickColor.setOnClickListener {
             showColorPicker()
@@ -103,6 +109,30 @@ class GameSheetActivity : AppCompatActivity() {
                 }
                 .setNegativeButton(android.R.string.cancel, null)
                 .show()
+        }
+    }
+
+    /**
+     * Toggles the visibility of the drawing controls (color, width, undo, clear).
+     * The toggle button remains visible.
+     */
+    private fun toggleToolbarControls() {
+        toolbarControlsVisible = !toolbarControlsVisible
+        val visibility = if (toolbarControlsVisible) android.view.View.VISIBLE else android.view.View.GONE
+
+        binding.btnPickColor.visibility = visibility
+        // Find and hide the width label and seekbar
+        binding.seekBarWidth.visibility = visibility
+        binding.btnUndo.visibility = visibility
+        binding.btnClear.visibility = visibility
+
+        // Also hide the width label by finding it in the toolbar
+        for (i in 0 until binding.drawingToolbar.childCount) {
+            val child = binding.drawingToolbar.getChildAt(i)
+            if (child is android.widget.TextView && child.text == getString(R.string.label_width)) {
+                child.visibility = visibility
+                break
+            }
         }
     }
 
