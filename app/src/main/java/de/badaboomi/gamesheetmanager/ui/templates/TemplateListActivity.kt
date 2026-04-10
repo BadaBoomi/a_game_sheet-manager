@@ -33,6 +33,14 @@ class TemplateListActivity : AppCompatActivity() {
         private const val SAVED_CAMERA_FILE_PATH = "camera_file_path"
     }
 
+    private lateinit var binding: ActivityTemplateListBinding
+    private lateinit var templateRepository: TemplateRepository
+    private lateinit var gameSheetRepository: GameSheetRepository
+    private lateinit var adapter: TemplateAdapter
+    private val templates = mutableListOf<Template>()
+    private var mode = MODE_MANAGE
+    private var cameraImageFile: File? = null
+
     private val galleryLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
