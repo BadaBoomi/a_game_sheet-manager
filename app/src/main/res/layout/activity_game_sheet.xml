@@ -30,7 +30,7 @@
             android:src="@drawable/ic_color_circle"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/btn_pick_color"
-            android:colorFilter="@android:color/black" />
+            android:tint="@android:color/black" />
 
         <TextView
             android:layout_width="wrap_content"
