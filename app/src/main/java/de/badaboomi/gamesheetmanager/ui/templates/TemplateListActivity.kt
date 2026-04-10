@@ -30,17 +30,6 @@ class TemplateListActivity : AppCompatActivity() {
         const val EXTRA_MODE = "mode"
         const val MODE_MANAGE = "manage"
         const val MODE_SELECT = "select"
-    }
-
-    private lateinit var binding: ActivityTemplateListBinding
-    private lateinit var templateRepository: TemplateRepository
-    private lateinit var gameSheetRepository: GameSheetRepository
-    private lateinit var adapter: TemplateAdapter
-    private val templates = mutableListOf<Template>()
-    private var mode = MODE_MANAGE
-    private var cameraImageFile: File? = null
-
-    companion object {
         private const val SAVED_CAMERA_FILE_PATH = "camera_file_path"
     }
 
