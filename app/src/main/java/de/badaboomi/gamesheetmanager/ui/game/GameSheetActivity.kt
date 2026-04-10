@@ -78,6 +78,9 @@ class GameSheetActivity : AppCompatActivity() {
         binding.btnToggleToolbar.setOnClickListener {
             toggleToolbarControls()
         }
+        binding.btnShowControls.setOnClickListener {
+            toggleToolbarControls()
+        }
 
         // Color picker button
         binding.btnPickColor.setOnClickListener {
@@ -121,18 +124,15 @@ class GameSheetActivity : AppCompatActivity() {
         val visibility = if (toolbarControlsVisible) android.view.View.VISIBLE else android.view.View.GONE
 
         binding.btnPickColor.visibility = visibility
-        // Find and hide the width label and seekbar
+        binding.tvWidthLabel.visibility = visibility
         binding.seekBarWidth.visibility = visibility
         binding.btnUndo.visibility = visibility
         binding.btnClear.visibility = visibility
-
-        // Also hide the width label by finding it in the toolbar
-        for (i in 0 until binding.drawingToolbar.childCount) {
-            val child = binding.drawingToolbar.getChildAt(i)
-            if (child is android.widget.TextView && child.text == getString(R.string.label_width)) {
-                child.visibility = visibility
-                break
-            }
+        binding.btnToggleToolbar.visibility = visibility
+        binding.btnShowControls.visibility = if (toolbarControlsVisible) {
+            android.view.View.GONE
+        } else {
+            android.view.View.VISIBLE
         }
     }
 

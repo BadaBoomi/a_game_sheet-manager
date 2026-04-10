@@ -45,6 +45,7 @@
     <!-- Drawing toolbar -->
     <string name="btn_pick_color">Farbe wählen</string>
     <string name="btn_toggle_toolbar">Controls ein-/ausblenden</string>
+    <string name="btn_show_controls">Controls anzeigen</string>
     <string name="label_width">Breite:</string>
     <string name="btn_undo">Rückgängig</string>
     <string name="btn_clear">Alles löschen</string>
