@@ -73,6 +73,15 @@
             android:text="@string/btn_hall_of_fame"
             style="@style/Widget.MaterialComponents.Button.TextButton" />
 
+        <TextView
+            android:id="@+id/tvVersion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="10sp"
+            android:textColor="@android:color/darker_gray"
+            android:layout_marginTop="48dp"
+            android:gravity="center" />
+
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

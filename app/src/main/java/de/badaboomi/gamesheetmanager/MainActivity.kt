@@ -35,5 +35,8 @@ class MainActivity : AppCompatActivity() {
         binding.btnHallOfFame.setOnClickListener {
             startActivity(Intent(this, HallOfFameActivity::class.java))
         }
+
+        // Display version info
+        binding.tvVersion.text = getString(R.string.version_label, BuildConfig.VERSION_NAME)
     }
 }
