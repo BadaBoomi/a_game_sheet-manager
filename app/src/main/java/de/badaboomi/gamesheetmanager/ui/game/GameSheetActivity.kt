@@ -83,8 +83,12 @@ class GameSheetActivity : AppCompatActivity() {
     }
 
     private fun setupFloatingMenuButton() {
-        val menuButton = binding.btnShowControls
+        val menuButton = binding.btnMenuHandle
         menuButton.setColorFilter(binding.drawingView.penColor)
+        binding.btnQuickUndo.setOnClickListener {
+            binding.drawingView.undoLastStroke()
+        }
+
         val gestureDetector = GestureDetectorCompat(
             this,
             object : GestureDetector.SimpleOnGestureListener() {
@@ -110,7 +114,7 @@ class GameSheetActivity : AppCompatActivity() {
             when (event.actionMasked) {
                 MotionEvent.ACTION_MOVE -> {
                     if (isDraggingMenuButton) {
-                        repositionMenuButton(view, event)
+                        repositionFloatingControls(event)
                         return@setOnTouchListener true
                     }
                 }
@@ -128,20 +132,21 @@ class GameSheetActivity : AppCompatActivity() {
         }
     }
 
-    private fun repositionMenuButton(view: View, event: MotionEvent) {
-        val parentView = view.parent as? View ?: return
+    private fun repositionFloatingControls(event: MotionEvent) {
+        val controls = binding.floatingControls
+        val parentView = controls.parent as? View ?: return
         val parentLocation = IntArray(2)
         parentView.getLocationOnScreen(parentLocation)
 
         val targetX = event.rawX - parentLocation[0] - dragTouchOffsetX
         val targetY = event.rawY - parentLocation[1] - dragTouchOffsetY
 
-        view.x = targetX.coerceIn(0f, (parentView.width - view.width).toFloat())
-        view.y = targetY.coerceIn(0f, (parentView.height - view.height).toFloat())
+        controls.x = targetX.coerceIn(0f, (parentView.width - controls.width).toFloat())
+        controls.y = targetY.coerceIn(0f, (parentView.height - controls.height).toFloat())
     }
 
     private fun showFloatingMenu() {
-        PopupMenu(this, binding.btnShowControls).apply {
+        PopupMenu(this, binding.btnMenuHandle).apply {
             menu.add(0, MENU_ITEM_STYLE, 0, getString(R.string.action_change_pen_style))
             menu.add(0, MENU_ITEM_SAVE, 1, getString(R.string.action_save))
             menu.add(0, MENU_ITEM_FINISH_AND_SAVE, 2, getString(R.string.action_finish_and_save_hof))
@@ -189,7 +194,7 @@ class GameSheetActivity : AppCompatActivity() {
         ) { color, width ->
             binding.drawingView.penColor = color
             binding.drawingView.penWidth = width
-            binding.btnShowControls.setColorFilter(color)
+            binding.btnMenuHandle.setColorFilter(color)
         }.show()
     }
 
