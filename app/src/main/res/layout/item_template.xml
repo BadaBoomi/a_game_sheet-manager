@@ -43,6 +43,24 @@
     </LinearLayout>
 
     <ImageButton
+        android:id="@+id/btnSendTemplate"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_bluetooth_send"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/btn_send_bluetooth"
+        android:tint="@android:color/holo_blue_dark" />
+
+    <ImageButton
+        android:id="@+id/btnEditTemplate"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_edit"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/btn_edit"
+        android:tint="@android:color/holo_orange_dark" />
+
+    <ImageButton
         android:id="@+id/btnDeleteTemplate"
         android:layout_width="40dp"
         android:layout_height="40dp"

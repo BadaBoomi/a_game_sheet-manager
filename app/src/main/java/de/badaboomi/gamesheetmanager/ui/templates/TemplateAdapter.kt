@@ -22,6 +22,8 @@ class TemplateAdapter(
     private val templates: List<Template>,
     private val onItemClick: (Template) -> Unit,
     private val onDeleteClick: (Template) -> Unit,
+    private val onEditClick: (Template) -> Unit,
+    private val onSendClick: (Template) -> Unit,
     private val showDeleteButton: Boolean
 ) : BaseAdapter() {
 
@@ -52,6 +54,14 @@ class TemplateAdapter(
         val btnDelete = view.findViewById<ImageButton>(R.id.btnDeleteTemplate)
         btnDelete.visibility = if (showDeleteButton) View.VISIBLE else View.GONE
         btnDelete.setOnClickListener { onDeleteClick(template) }
+
+        val btnEdit = view.findViewById<ImageButton>(R.id.btnEditTemplate)
+        btnEdit.visibility = if (showDeleteButton) View.VISIBLE else View.GONE
+        btnEdit.setOnClickListener { onEditClick(template) }
+
+        val btnSend = view.findViewById<ImageButton>(R.id.btnSendTemplate)
+        btnSend.visibility = if (showDeleteButton) View.VISIBLE else View.GONE
+        btnSend.setOnClickListener { onSendClick(template) }
 
         view.setOnClickListener { onItemClick(template) }
 
