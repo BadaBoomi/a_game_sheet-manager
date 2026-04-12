@@ -83,6 +83,7 @@ class GameSheetActivity : AppCompatActivity() {
 
     private fun setupFloatingMenuButton() {
         val menuButton = binding.btnShowControls
+        menuButton.setColorFilter(binding.drawingView.penColor)
         val gestureDetector = GestureDetectorCompat(
             this,
             object : GestureDetector.SimpleOnGestureListener() {
