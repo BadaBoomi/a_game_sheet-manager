@@ -30,6 +30,10 @@ class GameSheetActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_SHEET_ID = "sheet_id"
+        const val MENU_ITEM_STYLE = 1
+        const val MENU_ITEM_SAVE = 2
+        const val MENU_ITEM_FINISH_AND_SAVE = 3
+        const val MENU_ITEM_FINISH_WITHOUT_SAVE = 4
     }
 
     private lateinit var binding: ActivityGameSheetBinding
@@ -40,13 +44,6 @@ class GameSheetActivity : AppCompatActivity() {
     private var isDraggingMenuButton = false
     private var dragTouchOffsetX = 0f
     private var dragTouchOffsetY = 0f
-
-    private companion object {
-        const val MENU_ITEM_STYLE = 1
-        const val MENU_ITEM_SAVE = 2
-        const val MENU_ITEM_FINISH_AND_SAVE = 3
-        const val MENU_ITEM_FINISH_WITHOUT_SAVE = 4
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
