@@ -25,6 +25,9 @@
     <string name="default_template_name">Vorlage</string>
     <string name="option_take_photo">Foto aufnehmen</string>
     <string name="option_from_gallery">Aus Galerie auswählen</string>
+    <string name="title_crop_template">Vorlage zuschneiden</string>
+    <string name="msg_crop_cancelled">Zuschneiden abgebrochen</string>
+    <string name="msg_crop_failed">Bild konnte nicht zugeschnitten werden</string>
     <string name="msg_template_saved">Vorlage gespeichert</string>
     <string name="msg_template_save_error">Fehler beim Speichern der Vorlage</string>
     <string name="msg_template_deleted">Vorlage gelöscht</string>

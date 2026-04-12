@@ -96,40 +96,23 @@ object FileUtils {
         val srcWidth = sampledBitmap.width
         val srcHeight = sampledBitmap.height
 
-        val targetRatio = targetWidth.toFloat() / targetHeight.toFloat()
-        val srcRatio = srcWidth.toFloat() / srcHeight.toFloat()
-
-        val cropWidth: Int
-        val cropHeight: Int
-        val cropX: Int
-        val cropY: Int
-
-        if (srcRatio > targetRatio) {
-            cropHeight = srcHeight
-            cropWidth = (srcHeight * targetRatio).toInt().coerceAtMost(srcWidth)
-            cropX = ((srcWidth - cropWidth) / 2).coerceAtLeast(0)
-            cropY = 0
-        } else {
-            cropWidth = srcWidth
-            cropHeight = (srcWidth / targetRatio).toInt().coerceAtMost(srcHeight)
-            cropX = 0
-            cropY = ((srcHeight - cropHeight) / 2).coerceAtLeast(0)
+        if (srcWidth <= targetWidth && srcHeight <= targetHeight) {
+            return sampledBitmap
         }
 
-        val croppedBitmap = Bitmap.createBitmap(sampledBitmap, cropX, cropY, cropWidth, cropHeight)
-        if (croppedBitmap !== sampledBitmap) {
+        val scale = minOf(
+            targetWidth.toFloat() / srcWidth.toFloat(),
+            targetHeight.toFloat() / srcHeight.toFloat()
+        )
+
+        val scaledWidth = (srcWidth * scale).toInt().coerceAtLeast(1)
+        val scaledHeight = (srcHeight * scale).toInt().coerceAtLeast(1)
+
+        val scaledBitmap = Bitmap.createScaledBitmap(sampledBitmap, scaledWidth, scaledHeight, true)
+        if (scaledBitmap !== sampledBitmap) {
             sampledBitmap.recycle()
         }
-
-        return if (croppedBitmap.width == targetWidth && croppedBitmap.height == targetHeight) {
-            croppedBitmap
-        } else {
-            val scaledBitmap = Bitmap.createScaledBitmap(croppedBitmap, targetWidth, targetHeight, true)
-            if (scaledBitmap !== croppedBitmap) {
-                croppedBitmap.recycle()
-            }
-            scaledBitmap
-        }
+        return scaledBitmap
     }
 
     private fun calculateInSampleSize(

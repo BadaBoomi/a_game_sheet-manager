@@ -2,6 +2,7 @@ package de.badaboomi.gamesheetmanager.ui.templates
 
 import android.Manifest
 import android.content.Intent
+import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.view.MenuItem
@@ -20,6 +21,7 @@ import de.badaboomi.gamesheetmanager.repository.GameSheetRepository
 import de.badaboomi.gamesheetmanager.repository.TemplateRepository
 import de.badaboomi.gamesheetmanager.ui.game.GameSheetActivity
 import de.badaboomi.gamesheetmanager.utils.FileUtils
+import com.yalantis.ucrop.UCrop
 import java.io.File
 
 /**
@@ -42,6 +44,7 @@ class TemplateListActivity : AppCompatActivity() {
     private val templates = mutableListOf<Template>()
     private var mode = MODE_MANAGE
     private var cameraImageFile: File? = null
+    private var pendingTemplateImageUri: Uri? = null
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -60,7 +63,7 @@ class TemplateListActivity : AppCompatActivity() {
     private val galleryLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
-        uri?.let { handleImageSelected(it) }
+        uri?.let { launchCropFlow(it) }
     }
 
     private val cameraLauncher = registerForActivityResult(
@@ -75,7 +78,7 @@ class TemplateListActivity : AppCompatActivity() {
                     "${packageName}.fileprovider",
                     file
                 )
-                handleImageSelected(uri)
+                launchCropFlow(uri)
             } else {
                 Toast.makeText(this, R.string.msg_photo_failed, Toast.LENGTH_SHORT).show()
                 file.delete()
@@ -83,6 +86,24 @@ class TemplateListActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, R.string.msg_photo_cancelled, Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private val cropLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val outputUri = result.data?.let { UCrop.getOutput(it) }
+            if (outputUri != null) {
+                handleImageSelected(outputUri)
+            } else {
+                Toast.makeText(this, R.string.msg_crop_failed, Toast.LENGTH_SHORT).show()
+            }
+        } else if (result.resultCode == RESULT_CANCELED) {
+            Toast.makeText(this, R.string.msg_crop_cancelled, Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, R.string.msg_crop_failed, Toast.LENGTH_SHORT).show()
+        }
+        pendingTemplateImageUri = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -230,6 +251,25 @@ class TemplateListActivity : AppCompatActivity() {
 
     private fun pickFromGallery() {
         galleryLauncher.launch("image/*")
+    }
+
+    private fun launchCropFlow(sourceUri: Uri) {
+        pendingTemplateImageUri = sourceUri
+        val destinationFile = File(cacheDir, "crop_${System.currentTimeMillis()}.jpg")
+        val destinationUri = Uri.fromFile(destinationFile)
+
+        val options = UCrop.Options().apply {
+            setCompressionFormat(Bitmap.CompressFormat.JPEG)
+            setCompressionQuality(95)
+            setFreeStyleCropEnabled(true)
+            setToolbarTitle(getString(R.string.title_crop_template))
+        }
+
+        val cropIntent = UCrop.of(sourceUri, destinationUri)
+            .withOptions(options)
+            .getIntent(this)
+
+        cropLauncher.launch(cropIntent)
     }
 
     private fun handleImageSelected(uri: Uri) {
