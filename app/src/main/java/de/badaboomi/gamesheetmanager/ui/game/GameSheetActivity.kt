@@ -181,8 +181,7 @@ class GameSheetActivity : AppCompatActivity() {
         ) { color, width ->
             binding.drawingView.penColor = color
             binding.drawingView.penWidth = width
-            binding.btnPickColor.setColorFilter(color)
-            binding.seekBarWidth.progress = (width - 2).toInt()
+            binding.btnShowControls.setColorFilter(color)
         }.show()
     }
 
