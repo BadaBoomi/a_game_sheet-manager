@@ -19,97 +19,17 @@
         android:layout_height="match_parent"
         android:background="@android:color/transparent" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_gravity="top">
-
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
-
-        <!-- Drawing controls toolbar (collapsible) -->
-        <LinearLayout
-            android:id="@+id/drawingToolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="#D9FFFFFF"
-            android:padding="8dp"
-            android:gravity="center_vertical"
-            android:elevation="4dp">
-
-            <ImageButton
-                android:id="@+id/btnToggleToolbar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_clear"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/btn_toggle_toolbar"
-                android:tint="@android:color/black" />
-
-            <ImageButton
-                android:id="@+id/btnPickColor"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_color_circle"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/btn_pick_color"
-                android:tint="@android:color/black" />
-
-            <TextView
-                android:id="@+id/tvWidthLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/label_width"
-                android:textSize="12sp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="4dp" />
-
-            <SeekBar
-                android:id="@+id/seekBarWidth"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:max="48"
-                android:progress="6" />
-
-            <ImageButton
-                android:id="@+id/btnUndo"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_undo"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/btn_undo"
-                android:layout_marginStart="8dp" />
-
-            <ImageButton
-                android:id="@+id/btnClear"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_clear"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/btn_clear"
-                android:layout_marginStart="4dp" />
-
-        </LinearLayout>
-    </LinearLayout>
-
     <ImageButton
         android:id="@+id/btnShowControls"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_gravity="top|end"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         android:src="@drawable/ic_color_circle"
         android:background="@android:color/transparent"
-        android:contentDescription="@string/btn_show_controls"
-        android:visibility="gone"
+        android:contentDescription="@string/btn_floating_menu"
+        android:visibility="visible"
         app:tint="@android:color/white" />
 
 </FrameLayout>

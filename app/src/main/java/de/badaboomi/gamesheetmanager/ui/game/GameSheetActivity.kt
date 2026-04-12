@@ -1,13 +1,18 @@
 package de.badaboomi.gamesheetmanager.ui.game
 
 import android.graphics.BitmapFactory
+import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.widget.SeekBar
+import android.view.GestureDetector
+import android.view.HapticFeedbackConstants
+import android.view.MotionEvent
+import android.view.View
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.GestureDetectorCompat
+import de.badaboomi.gamesheetmanager.MainActivity
 import de.badaboomi.gamesheetmanager.R
 import de.badaboomi.gamesheetmanager.data.GameSheet
 import de.badaboomi.gamesheetmanager.data.HallOfFameEntry
@@ -32,14 +37,21 @@ class GameSheetActivity : AppCompatActivity() {
     private lateinit var hallOfFameRepository: HallOfFameRepository
     private var currentSheet: GameSheet? = null
     private var sheetId: Long = -1
-    private var toolbarControlsVisible = true
+    private var isDraggingMenuButton = false
+    private var dragTouchOffsetX = 0f
+    private var dragTouchOffsetY = 0f
+
+    private companion object {
+        const val MENU_ITEM_STYLE = 1
+        const val MENU_ITEM_SAVE = 2
+        const val MENU_ITEM_FINISH_AND_SAVE = 3
+        const val MENU_ITEM_FINISH_WITHOUT_SAVE = 4
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityGameSheetBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         gameSheetRepository = GameSheetRepository(this)
         hallOfFameRepository = HallOfFameRepository(this)
@@ -51,7 +63,7 @@ class GameSheetActivity : AppCompatActivity() {
         }
 
         loadGameSheet()
-        setupToolbarButtons()
+        setupFloatingMenuButton()
     }
 
     private fun loadGameSheet() {
@@ -60,7 +72,6 @@ class GameSheetActivity : AppCompatActivity() {
             return
         }
         currentSheet = sheet
-        supportActionBar?.title = sheet.templateName
 
         // Load template image
         val imageFile = File(sheet.templateImagePath)
@@ -73,67 +84,96 @@ class GameSheetActivity : AppCompatActivity() {
         binding.drawingView.loadStrokes(sheet.drawingData)
     }
 
-    private fun setupToolbarButtons() {
-        // Toggle toolbar button
-        binding.btnToggleToolbar.setOnClickListener {
-            toggleToolbarControls()
-        }
-        binding.btnShowControls.setOnClickListener {
-            toggleToolbarControls()
-        }
+    private fun setupFloatingMenuButton() {
+        val menuButton = binding.btnShowControls
+        val gestureDetector = GestureDetectorCompat(
+            this,
+            object : GestureDetector.SimpleOnGestureListener() {
+                override fun onDown(e: MotionEvent): Boolean = true
 
-        // Color picker button
-        binding.btnPickColor.setOnClickListener {
-            showColorPicker()
-        }
-
-        // Stroke width seekbar
-        binding.seekBarWidth.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
-                binding.drawingView.penWidth = (progress + 2).toFloat()
-            }
-            override fun onStartTrackingTouch(seekBar: SeekBar) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar) {}
-        })
-        binding.seekBarWidth.progress = (binding.drawingView.penWidth - 2).toInt()
-
-        // Undo button
-        binding.btnUndo.setOnClickListener {
-            binding.drawingView.undoLastStroke()
-        }
-
-        // Clear button
-        binding.btnClear.setOnClickListener {
-            AlertDialog.Builder(this)
-                .setTitle(R.string.dialog_clear_title)
-                .setMessage(R.string.dialog_clear_message)
-                .setPositiveButton(R.string.btn_clear) { _, _ ->
-                    binding.drawingView.clearDrawing()
+                override fun onDoubleTap(e: MotionEvent): Boolean {
+                    showFloatingMenu()
+                    return true
                 }
-                .setNegativeButton(android.R.string.cancel, null)
-                .show()
+
+                override fun onLongPress(e: MotionEvent) {
+                    isDraggingMenuButton = true
+                    dragTouchOffsetX = e.x
+                    dragTouchOffsetY = e.y
+                    menuButton.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                }
+            }
+        )
+
+        menuButton.setOnTouchListener { view, event ->
+            gestureDetector.onTouchEvent(event)
+
+            when (event.actionMasked) {
+                MotionEvent.ACTION_MOVE -> {
+                    if (isDraggingMenuButton) {
+                        repositionMenuButton(view, event)
+                        return@setOnTouchListener true
+                    }
+                }
+
+                MotionEvent.ACTION_UP,
+                MotionEvent.ACTION_CANCEL -> {
+                    if (isDraggingMenuButton) {
+                        isDraggingMenuButton = false
+                        return@setOnTouchListener true
+                    }
+                }
+            }
+
+            true
         }
     }
 
-    /**
-     * Toggles the visibility of the drawing controls (color, width, undo, clear).
-     * The toggle button remains visible.
-     */
-    private fun toggleToolbarControls() {
-        toolbarControlsVisible = !toolbarControlsVisible
-        val visibility = if (toolbarControlsVisible) android.view.View.VISIBLE else android.view.View.GONE
+    private fun repositionMenuButton(view: View, event: MotionEvent) {
+        val parentView = view.parent as? View ?: return
+        val parentLocation = IntArray(2)
+        parentView.getLocationOnScreen(parentLocation)
 
-        binding.btnPickColor.visibility = visibility
-        binding.tvWidthLabel.visibility = visibility
-        binding.seekBarWidth.visibility = visibility
-        binding.btnUndo.visibility = visibility
-        binding.btnClear.visibility = visibility
-        binding.btnToggleToolbar.visibility = visibility
-        binding.btnShowControls.visibility = if (toolbarControlsVisible) {
-            android.view.View.GONE
-        } else {
-            android.view.View.VISIBLE
-        }
+        val targetX = event.rawX - parentLocation[0] - dragTouchOffsetX
+        val targetY = event.rawY - parentLocation[1] - dragTouchOffsetY
+
+        view.x = targetX.coerceIn(0f, (parentView.width - view.width).toFloat())
+        view.y = targetY.coerceIn(0f, (parentView.height - view.height).toFloat())
+    }
+
+    private fun showFloatingMenu() {
+        PopupMenu(this, binding.btnShowControls).apply {
+            menu.add(0, MENU_ITEM_STYLE, 0, getString(R.string.action_change_pen_style))
+            menu.add(0, MENU_ITEM_SAVE, 1, getString(R.string.action_save))
+            menu.add(0, MENU_ITEM_FINISH_AND_SAVE, 2, getString(R.string.action_finish_and_save_hof))
+            menu.add(0, MENU_ITEM_FINISH_WITHOUT_SAVE, 3, getString(R.string.action_finish_without_save))
+
+            setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    MENU_ITEM_STYLE -> {
+                        showColorPicker()
+                        true
+                    }
+
+                    MENU_ITEM_SAVE -> {
+                        saveCurrentState()
+                        true
+                    }
+
+                    MENU_ITEM_FINISH_AND_SAVE -> {
+                        finishGame()
+                        true
+                    }
+
+                    MENU_ITEM_FINISH_WITHOUT_SAVE -> {
+                        finishWithoutSaving()
+                        true
+                    }
+
+                    else -> false
+                }
+            }
+        }.show()
     }
 
     private fun showColorPicker() {
@@ -196,33 +236,33 @@ class GameSheetActivity : AppCompatActivity() {
                 currentSheet = null
 
                 Toast.makeText(this, R.string.msg_saved_to_hof, Toast.LENGTH_LONG).show()
-                finish()
+                navigateToStartPage()
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_game_sheet, menu)
-        return true
+    private fun finishWithoutSaving() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.dialog_finish_without_save_title)
+            .setMessage(R.string.dialog_finish_without_save_message)
+            .setPositiveButton(R.string.action_finish_without_save) { _, _ ->
+                currentSheet?.let { sheet ->
+                    gameSheetRepository.deleteGameSheet(sheet.id)
+                    currentSheet = null
+                }
+                navigateToStartPage()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            android.R.id.home -> {
-                onBackPressedDispatcher.onBackPressed()
-                true
-            }
-            R.id.action_save -> {
-                saveCurrentState()
-                true
-            }
-            R.id.action_finish_game -> {
-                finishGame()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
+    private fun navigateToStartPage() {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         }
+        startActivity(intent)
+        finish()
     }
 
     override fun onPause() {
