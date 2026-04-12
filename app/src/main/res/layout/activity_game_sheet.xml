@@ -12,7 +12,7 @@
         android:id="@+id/ivTemplateBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="fitXY"
+        android:scaleType="centerCrop"
         android:contentDescription="@string/template_background_desc" />
 
     <de.badaboomi.gamesheetmanager.ui.game.DrawingView
