@@ -374,22 +374,24 @@ class TemplateListActivity : AppCompatActivity() {
             cropLauncher.launch(cropIntent)
         } catch (_: ActivityNotFoundException) {
             Toast.makeText(this, R.string.msg_crop_failed, Toast.LENGTH_SHORT).show()
-            val editing = editingTemplate
-            if (editing != null) {
-                editingTemplate = null
-                updateTemplateImage(editing, sourceUri)
-            } else {
-                handleImageSelected(sourceUri)
-            }
+            fallbackFromCrop(sourceUri)
         } catch (_: Exception) {
             Toast.makeText(this, R.string.msg_crop_failed, Toast.LENGTH_SHORT).show()
-            val editing = editingTemplate
-            if (editing != null) {
-                editingTemplate = null
-                updateTemplateImage(editing, sourceUri)
-            } else {
-                handleImageSelected(sourceUri)
-            }
+            fallbackFromCrop(sourceUri)
+        }
+    }
+
+    /**
+     * Handles the case where the crop flow fails or is unavailable.
+     * Routes to either the template-update path or the new-template path.
+     */
+    private fun fallbackFromCrop(sourceUri: Uri) {
+        val editing = editingTemplate
+        if (editing != null) {
+            editingTemplate = null
+            updateTemplateImage(editing, sourceUri)
+        } else {
+            handleImageSelected(sourceUri)
         }
     }
 

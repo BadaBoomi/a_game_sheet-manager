@@ -16,7 +16,4 @@ object BluetoothConstants {
 
     /** Magic header to identify valid protocol packets. */
     const val PROTOCOL_HEADER = "GSM_TEMPLATE_V1"
-
-    /** Buffer size for reading/writing data. */
-    const val BUFFER_SIZE = 8192
 }
