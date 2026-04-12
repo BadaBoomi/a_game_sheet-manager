@@ -1,6 +1,7 @@
 package de.badaboomi.gamesheetmanager.ui.templates
 
 import android.Manifest
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -268,8 +269,18 @@ class TemplateListActivity : AppCompatActivity() {
         val cropIntent = UCrop.of(sourceUri, destinationUri)
             .withOptions(options)
             .getIntent(this)
+            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            .addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
 
-        cropLauncher.launch(cropIntent)
+        try {
+            cropLauncher.launch(cropIntent)
+        } catch (_: ActivityNotFoundException) {
+            Toast.makeText(this, R.string.msg_crop_failed, Toast.LENGTH_SHORT).show()
+            handleImageSelected(sourceUri)
+        } catch (_: Exception) {
+            Toast.makeText(this, R.string.msg_crop_failed, Toast.LENGTH_SHORT).show()
+            handleImageSelected(sourceUri)
+        }
     }
 
     private fun handleImageSelected(uri: Uri) {
