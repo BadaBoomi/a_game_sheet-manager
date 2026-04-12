@@ -33,7 +33,8 @@ class GameSheetActivity : AppCompatActivity() {
         const val MENU_ITEM_STYLE = 1
         const val MENU_ITEM_SAVE = 2
         const val MENU_ITEM_FINISH_AND_SAVE = 3
-        const val MENU_ITEM_FINISH_WITHOUT_SAVE = 4
+        const val MENU_ITEM_SAVE_AND_FINISH = 4
+        const val MENU_ITEM_FINISH_WITHOUT_SAVE = 5
     }
 
     private lateinit var binding: ActivityGameSheetBinding
@@ -144,7 +145,8 @@ class GameSheetActivity : AppCompatActivity() {
             menu.add(0, MENU_ITEM_STYLE, 0, getString(R.string.action_change_pen_style))
             menu.add(0, MENU_ITEM_SAVE, 1, getString(R.string.action_save))
             menu.add(0, MENU_ITEM_FINISH_AND_SAVE, 2, getString(R.string.action_finish_and_save_hof))
-            menu.add(0, MENU_ITEM_FINISH_WITHOUT_SAVE, 3, getString(R.string.action_finish_without_save))
+            menu.add(0, MENU_ITEM_SAVE_AND_FINISH, 3, getString(R.string.action_save_and_finish))
+            menu.add(0, MENU_ITEM_FINISH_WITHOUT_SAVE, 4, getString(R.string.action_finish_without_save))
 
             setOnMenuItemClickListener { item ->
                 when (item.itemId) {
@@ -160,6 +162,11 @@ class GameSheetActivity : AppCompatActivity() {
 
                     MENU_ITEM_FINISH_AND_SAVE -> {
                         finishGame()
+                        true
+                    }
+
+                    MENU_ITEM_SAVE_AND_FINISH -> {
+                        saveAndFinish()
                         true
                     }
 
@@ -252,6 +259,11 @@ class GameSheetActivity : AppCompatActivity() {
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
+    }
+
+    private fun saveAndFinish() {
+        saveCurrentState()
+        navigateToStartPage()
     }
 
     private fun navigateToStartPage() {

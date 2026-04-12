@@ -62,6 +62,7 @@
     <string name="action_save">Zwischenstand speichern</string>
     <string name="action_finish_game">Spiel beenden</string>
     <string name="action_finish_and_save_hof">Spiel beenden und in Hall of Fame speichern</string>
+    <string name="action_save_and_finish">Speichern und beenden</string>
     <string name="action_finish_without_save">Spiel ohne Speichern beenden</string>
     <string name="msg_sheet_saved">Zwischenstand gespeichert</string>
 
