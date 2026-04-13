@@ -12,7 +12,6 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
@@ -268,12 +267,14 @@ class TemplateListActivity : AppCompatActivity() {
             .setItems(
                 arrayOf(
                     getString(R.string.option_take_photo),
-                    getString(R.string.option_from_gallery)
+                    getString(R.string.option_from_gallery),
+                    getString(R.string.option_receive_bluetooth)
                 )
             ) { _, which ->
                 when (which) {
                     0 -> takePhoto()
                     1 -> pickFromGallery()
+                    2 -> checkBtPermissionsAndReceive()
                 }
             }
             .show()
@@ -466,17 +467,12 @@ class TemplateListActivity : AppCompatActivity() {
             .show()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        if (mode == MODE_MANAGE) {
-            menuInflater.inflate(R.menu.menu_template_list, menu)
-        }
-        return true
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            android.R.id.home -> { finish(); true }
-            R.id.action_receive_bluetooth -> { checkBtPermissionsAndReceive(); true }
+            android.R.id.home -> {
+                finish()
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
