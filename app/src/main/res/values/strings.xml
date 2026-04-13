@@ -46,6 +46,9 @@
     <string name="empty_templates">Noch keine Vorlagen vorhanden.\n\nTippe auf + um eine Vorlage hinzuzufügen.</string>
 
     <!-- Bluetooth transfer -->
+    <string name="btn_receive_bluetooth">Per Bluetooth empfangen</string>
+    <string name="dialog_bt_listening_title">Warte auf Vorlage</string>
+    <string name="dialog_bt_listening_message">Das Gerät empfängt jetzt Vorlagen über Bluetooth.\n\nStelle sicher, dass Bluetooth auf dem sendenden Gerät aktiviert und das Gerät mit diesem Gerät gekoppelt ist.</string>
     <string name="title_bt_device_picker">Bluetooth-Gerät auswählen</string>
     <string name="btn_discover_devices">Geräte suchen…</string>
     <string name="empty_devices">Keine gekoppelten Geräte gefunden.\n\nTippe auf „Geräte suchen", um nach Geräten in der Nähe zu suchen.</string>

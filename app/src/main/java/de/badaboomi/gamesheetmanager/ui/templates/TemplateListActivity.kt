@@ -1,11 +1,18 @@
 package de.badaboomi.gamesheetmanager.ui.templates
 
 import android.Manifest
+import android.bluetooth.BluetoothManager
 import android.content.ActivityNotFoundException
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
@@ -16,6 +23,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import de.badaboomi.gamesheetmanager.R
 import de.badaboomi.gamesheetmanager.bluetooth.BluetoothDeviceListActivity
+import de.badaboomi.gamesheetmanager.bluetooth.TemplateReceiveService
 import de.badaboomi.gamesheetmanager.data.GameSheet
 import de.badaboomi.gamesheetmanager.data.Template
 import de.badaboomi.gamesheetmanager.databinding.ActivityTemplateListBinding
@@ -117,6 +125,27 @@ class TemplateListActivity : AppCompatActivity() {
         pendingTemplateImageUri = null
         editingTemplate = null
     }
+
+    private val btPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { results ->
+        if (results.values.all { it }) {
+            startBluetoothReceive()
+        } else {
+            Toast.makeText(this, R.string.msg_bt_permission_denied, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private val templateReceivedReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            stopBluetoothReceive()
+            receivingDialog?.dismiss()
+            receivingDialog = null
+            loadTemplates()
+        }
+    }
+    private var receiverRegistered = false
+    private var receivingDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -437,11 +466,83 @@ class TemplateListActivity : AppCompatActivity() {
             .show()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            finish()
-            return true
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        if (mode == MODE_MANAGE) {
+            menuInflater.inflate(R.menu.menu_template_list, menu)
         }
-        return super.onOptionsItemSelected(item)
+        return true
     }
-}
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> { finish(); true }
+            R.id.action_receive_bluetooth -> { checkBtPermissionsAndReceive(); true }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Bluetooth receive
+    // -------------------------------------------------------------------------
+
+    private fun checkBtPermissionsAndReceive() {
+        val required = mutableListOf<String>()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                required.add(Manifest.permission.BLUETOOTH_CONNECT)
+            }
+        }
+        if (required.isEmpty()) {
+            startBluetoothReceive()
+        } else {
+            btPermissionLauncher.launch(required.toTypedArray())
+        }
+    }
+
+    private fun startBluetoothReceive() {
+        val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
+        if (bluetoothManager?.adapter == null) {
+            Toast.makeText(this, R.string.msg_bt_not_supported, Toast.LENGTH_LONG).show()
+            return
+        }
+        if (bluetoothManager.adapter?.isEnabled != true) {
+            Toast.makeText(this, R.string.msg_bt_not_enabled, Toast.LENGTH_LONG).show()
+            return
+        }
+
+        val filter = IntentFilter(TemplateReceiveService.ACTION_TEMPLATE_RECEIVED)
+        ContextCompat.registerReceiver(
+            this, templateReceivedReceiver, filter,
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
+        receiverRegistered = true
+
+        TemplateReceiveService.start(this)
+
+        receivingDialog = AlertDialog.Builder(this)
+            .setTitle(R.string.dialog_bt_listening_title)
+            .setMessage(R.string.dialog_bt_listening_message)
+            .setCancelable(false)
+            .setNegativeButton(android.R.string.cancel) { _, _ ->
+                stopBluetoothReceive()
+            }
+            .show()
+    }
+
+    private fun stopBluetoothReceive() {
+        if (receiverRegistered) {
+            try {
+                unregisterReceiver(templateReceivedReceiver)
+            } catch (_: IllegalArgumentException) {
+            }
+            receiverRegistered = false
+        }
+        TemplateReceiveService.stop(this)
+    }
+
+    override fun onDestroy() {
+        stopBluetoothReceive()
+        super.onDestroy()
+    }

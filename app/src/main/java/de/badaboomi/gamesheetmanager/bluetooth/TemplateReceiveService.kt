@@ -33,6 +33,10 @@ class TemplateReceiveService : Service() {
         const val CHANNEL_ID = "bluetooth_receive_channel"
         const val NOTIFICATION_ID = 1001
 
+        /** Broadcast action sent when a template has been received and saved. */
+        const val ACTION_TEMPLATE_RECEIVED =
+            "de.badaboomi.gamesheetmanager.ACTION_TEMPLATE_RECEIVED"
+
         fun start(context: Context) {
             context.startForegroundService(Intent(context, TemplateReceiveService::class.java))
         }
@@ -129,6 +133,10 @@ class TemplateReceiveService : Service() {
 
                 val template = Template(name = name, imagePath = destFile.absolutePath)
                 TemplateRepository(this).insertTemplate(template)
+
+                sendBroadcast(
+                    Intent(ACTION_TEMPLATE_RECEIVED).apply { `package` = packageName }
+                )
 
                 mainThread {
                     Toast.makeText(
