@@ -11,8 +11,8 @@ android {
         applicationId = "de.badaboomi.gamesheetmanager"
         minSdk = 26
         targetSdk = 34
-        versionCode = 16
-        versionName = "1.7.9"
+        versionCode = 17
+        versionName = "1.8.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
