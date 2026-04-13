@@ -546,3 +546,4 @@ class TemplateListActivity : AppCompatActivity() {
         stopBluetoothReceive()
         super.onDestroy()
     }
+}
