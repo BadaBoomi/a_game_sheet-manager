@@ -1,6 +1,7 @@
 package de.badaboomi.gamesheetmanager
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -41,8 +42,9 @@ class MainActivity : AppCompatActivity() {
             showUsageGuide()
         }
 
-        binding.btnContact.setOnClickListener {
-            showContact()
+        binding.tvContactEmail.setOnClickListener {
+            val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:${getString(R.string.support_email)}"))
+            startActivity(Intent.createChooser(intent, null))
         }
 
         // Display version info
@@ -57,11 +59,4 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun showContact() {
-        AlertDialog.Builder(this)
-            .setTitle(R.string.title_contact)
-            .setMessage(getString(R.string.message_contact))
-            .setPositiveButton(android.R.string.ok, null)
-            .show()
-    }
 }
