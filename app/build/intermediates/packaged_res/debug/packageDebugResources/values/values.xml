@@ -61,12 +61,13 @@
     <string name="empty_templates">Noch keine Vorlagen vorhanden.\n\nTippe auf + um eine Vorlage hinzuzufügen.</string>
     <string name="hint_game_name">Spielname eingeben…</string>
     <string name="hint_template_name">Name eingeben…</string>
+    <string name="label_contact">Kontakt: support@dotzis.de</string>
     <string name="label_game_info">Vorlage: %1$s · Abgeschlossen: %2$s</string>
     <string name="label_pen_color">Farbe</string>
     <string name="label_pen_width">Strichbreite</string>
     <string name="label_unknown_device">Unbekanntes Gerät</string>
     <string name="label_width">Breite:</string>
-    <string name="message_usage_guide">1. Vorlage hinzufügen: Tippe auf + und wähle Foto, Galerie oder Bluetooth-Empfang.\n2. Vorlage verwalten: Bearbeite, sende oder lösche Vorlagen in der Liste.\n3. Spiel starten: Wähle eine Vorlage und zeichne direkt auf dem Spielbogen.\n4. Hall of Fame: Speichere abgeschlossene Spiele zur späteren Ansicht.</string>
+    <string name="message_usage_guide">1. Vorlage hinzufügen: Tippe auf + und wähle Foto, Galerie oder Bluetooth-Empfang.\n2. Vorlage verwalten: Bearbeite, sende oder lösche Vorlagen in der Liste.\n3. Spiel starten: Wähle eine Vorlage und zeichne direkt auf dem Spielbogen.\n4. Spielmenü nutzen: Im Spiel kannst du das Menü-Icon gedrückt halten und an eine andere Position ziehen. Tippe zweimal auf das Icon, um das Menü zu öffnen.\n5. Letzten Schritt rückgängig: Nutze im Spiel die Aktion „Rückgängig", um den letzten Zeichen-Schritt zu entfernen.\n6. Hall of Fame: Speichere abgeschlossene Spiele zur späteren Ansicht.</string>
     <string name="msg_bt_not_enabled">Bitte aktiviere Bluetooth und versuche es erneut.</string>
     <string name="msg_bt_not_supported">Dieses Gerät unterstützt kein Bluetooth.</string>
     <string name="msg_bt_permission_denied">Bluetooth-Berechtigung verweigert.</string>
@@ -92,6 +93,7 @@
     <string name="option_from_gallery">Aus Galerie auswählen</string>
     <string name="option_receive_bluetooth">Per Bluetooth empfangen</string>
     <string name="option_take_photo">Foto aufnehmen</string>
+    <string name="support_email">support@dotzis.de</string>
     <string name="template_background_desc">Spielvorlage</string>
     <string name="template_thumbnail_desc">Vorschaubild</string>
     <string name="title_bt_device_picker">Bluetooth-Gerät auswählen</string>
@@ -102,6 +104,7 @@
     <string name="title_select_template">Vorlage auswählen</string>
     <string name="title_templates">Vorlagen</string>
     <string name="title_usage_guide">Bedienungshinweise</string>
+    <string name="version_copyright">Version %s, © 2026 by HeiooDo.</string>
     <string name="version_label">Version %s</string>
     <style name="Theme.GameSheetManager" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>

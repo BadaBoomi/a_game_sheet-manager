@@ -4,7 +4,7 @@
             "outputFile": "de.badaboomi.gamesheetmanager.app-mergeDebugResources-30:/values-watch-v21/values-watch-v21.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Heiko\\.gradle\\caches\\9.3.1\\transforms\\1c149b591669302e785437fb3fd07af8\\workspace\\transformed\\appcompat-1.6.1\\res\\values-watch-v21\\values-watch-v21.xml",
+                    "source": "/home/heiko/.gradle/caches/8.11.1/transforms/ae2842a3faa2cdd38b9dbaa1c94933e4/transformed/appcompat-1.6.1/res/values-watch-v21/values-watch-v21.xml",
                     "from": {
                         "startLines": "2,6,10",
                         "startColumns": "4,4,4",

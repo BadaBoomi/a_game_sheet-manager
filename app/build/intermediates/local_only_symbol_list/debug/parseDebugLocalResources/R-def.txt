@@ -11,6 +11,7 @@ color teal_200
 color teal_700
 color white
 drawable bg_floating_menu
+drawable heioodo_logo
 drawable ic_add
 drawable ic_bluetooth_send
 drawable ic_clear
@@ -18,6 +19,7 @@ drawable ic_color_circle
 drawable ic_delete
 drawable ic_edit
 drawable ic_game_sheets
+drawable ic_launcher_foreground
 drawable ic_save
 drawable ic_template_placeholder
 drawable ic_undo
@@ -49,6 +51,7 @@ id progressDiscovery
 id progressSending
 id toolbar
 id tvCompletedDate
+id tvContact
 id tvEmptyDevices
 id tvGameInfo
 id tvGameName
@@ -117,6 +120,7 @@ string empty_hall_of_fame
 string empty_templates
 string hint_game_name
 string hint_template_name
+string label_contact
 string label_game_info
 string label_pen_color
 string label_pen_width
@@ -148,6 +152,7 @@ string option_change_name
 string option_from_gallery
 string option_receive_bluetooth
 string option_take_photo
+string support_email
 string template_background_desc
 string template_thumbnail_desc
 string title_bt_device_picker
@@ -158,6 +163,7 @@ string title_hall_of_fame_view
 string title_select_template
 string title_templates
 string title_usage_guide
+string version_copyright
 string version_label
 style Theme.GameSheetManager
 style Theme.GameSheetManager.Dialog

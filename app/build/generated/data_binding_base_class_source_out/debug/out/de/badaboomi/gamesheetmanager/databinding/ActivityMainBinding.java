@@ -38,18 +38,22 @@ public final class ActivityMainBinding implements ViewBinding {
   public final Toolbar toolbar;
 
   @NonNull
+  public final TextView tvContact;
+
+  @NonNull
   public final TextView tvVersion;
 
   private ActivityMainBinding(@NonNull CoordinatorLayout rootView,
       @NonNull MaterialButton btnHallOfFame, @NonNull MaterialButton btnManageTemplates,
       @NonNull MaterialButton btnStartGame, @NonNull ImageButton btnUsageGuide,
-      @NonNull Toolbar toolbar, @NonNull TextView tvVersion) {
+      @NonNull Toolbar toolbar, @NonNull TextView tvContact, @NonNull TextView tvVersion) {
     this.rootView = rootView;
     this.btnHallOfFame = btnHallOfFame;
     this.btnManageTemplates = btnManageTemplates;
     this.btnStartGame = btnStartGame;
     this.btnUsageGuide = btnUsageGuide;
     this.toolbar = toolbar;
+    this.tvContact = tvContact;
     this.tvVersion = tvVersion;
   }
 
@@ -110,6 +114,12 @@ public final class ActivityMainBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.tvContact;
+      TextView tvContact = ViewBindings.findChildViewById(rootView, id);
+      if (tvContact == null) {
+        break missingId;
+      }
+
       id = R.id.tvVersion;
       TextView tvVersion = ViewBindings.findChildViewById(rootView, id);
       if (tvVersion == null) {
@@ -117,7 +127,7 @@ public final class ActivityMainBinding implements ViewBinding {
       }
 
       return new ActivityMainBinding((CoordinatorLayout) rootView, btnHallOfFame,
-          btnManageTemplates, btnStartGame, btnUsageGuide, toolbar, tvVersion);
+          btnManageTemplates, btnStartGame, btnUsageGuide, toolbar, tvContact, tvVersion);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));
