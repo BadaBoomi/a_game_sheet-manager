@@ -51,6 +51,16 @@
             android:gravity="center"
             android:layout_marginBottom="48dp" />
 
+        <ImageButton
+            android:id="@+id/btnUsageGuide"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginBottom="24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/btn_usage_guide"
+            android:src="@drawable/ic_usage_guide"
+            android:tint="?attr/colorPrimary" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnManageTemplates"
             android:layout_width="match_parent"

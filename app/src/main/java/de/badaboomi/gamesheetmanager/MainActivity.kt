@@ -2,6 +2,7 @@ package de.badaboomi.gamesheetmanager
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import de.badaboomi.gamesheetmanager.databinding.ActivityMainBinding
 import de.badaboomi.gamesheetmanager.ui.halloffame.HallOfFameActivity
@@ -36,7 +37,19 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, HallOfFameActivity::class.java))
         }
 
+        binding.btnUsageGuide.setOnClickListener {
+            showUsageGuide()
+        }
+
         // Display version info
         binding.tvVersion.text = getString(R.string.version_label, BuildConfig.VERSION_NAME)
+    }
+
+    private fun showUsageGuide() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.title_usage_guide)
+            .setMessage(getString(R.string.message_usage_guide))
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
     }
 }

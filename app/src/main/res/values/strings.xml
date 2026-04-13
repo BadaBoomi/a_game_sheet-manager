@@ -14,6 +14,9 @@
     <string name="btn_manage_templates">Vorlagen verwalten</string>
     <string name="btn_start_game">Spiel starten</string>
     <string name="btn_hall_of_fame">Hall of Fame</string>
+    <string name="btn_usage_guide">Bedienungshinweise</string>
+    <string name="title_usage_guide">Bedienungshinweise</string>
+    <string name="message_usage_guide">1. Vorlage hinzufügen: Tippe auf + und wähle Foto, Galerie oder Bluetooth-Empfang.\n2. Vorlage verwalten: Bearbeite, sende oder lösche Vorlagen in der Liste.\n3. Spiel starten: Wähle eine Vorlage und zeichne direkt auf dem Spielbogen.\n4. Hall of Fame: Speichere abgeschlossene Spiele zur späteren Ansicht.</string>
 
     <!-- Template management -->
     <string name="btn_add_template">Vorlage hinzufügen</string>
