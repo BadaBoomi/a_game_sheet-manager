@@ -84,6 +84,13 @@
             android:text="@string/btn_hall_of_fame"
             style="@style/Widget.MaterialComponents.Button.TextButton" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnContact"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_contact"
+            style="@style/Widget.MaterialComponents.Button.TextButton" />
+
         <TextView
             android:id="@+id/tvVersion"
             android:layout_width="wrap_content"

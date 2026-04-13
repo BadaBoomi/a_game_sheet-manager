@@ -41,6 +41,10 @@ class MainActivity : AppCompatActivity() {
             showUsageGuide()
         }
 
+        binding.btnContact.setOnClickListener {
+            showContact()
+        }
+
         // Display version info
         binding.tvVersion.text = getString(R.string.version_label, BuildConfig.VERSION_NAME)
     }
@@ -49,6 +53,14 @@ class MainActivity : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle(R.string.title_usage_guide)
             .setMessage(getString(R.string.message_usage_guide))
+            .setPositiveButton(android.R.string.ok, null)
+            .show()
+    }
+
+    private fun showContact() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.title_contact)
+            .setMessage(getString(R.string.message_contact))
             .setPositiveButton(android.R.string.ok, null)
             .show()
     }
