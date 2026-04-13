@@ -16,7 +16,8 @@
     <string name="btn_hall_of_fame">Hall of Fame</string>
     <string name="btn_usage_guide">Bedienungshinweise</string>
     <string name="title_usage_guide">Bedienungshinweise</string>
-    <string name="message_usage_guide">1. Vorlage hinzufügen: Tippe auf + und wähle Foto, Galerie oder Bluetooth-Empfang.\n2. Vorlage verwalten: Bearbeite, sende oder lösche Vorlagen in der Liste.\n3. Spiel starten: Wähle eine Vorlage und zeichne direkt auf dem Spielbogen.\n4. Spielmenü nutzen: Im Spiel kannst du das Menü-Icon gedrückt halten und an eine andere Position ziehen. Tippe zweimal auf das Icon, um das Menü zu öffnen.\n5. Letzten Schritt rückgängig: Nutze im Spiel die Aktion „Rückgängig", um den letzten Zeichen-Schritt zu entfernen.\n6. Hall of Fame: Speichere abgeschlossene Spiele zur späteren Ansicht.</string>
+    <string name="support_email">support@dotzis.de</string>
+    <string name="message_usage_guide">1. Vorlage hinzufügen: Tippe auf + und wähle Foto, Galerie oder Bluetooth-Empfang.\n2. Vorlage verwalten: Bearbeite, sende oder lösche Vorlagen in der Liste.\n3. Spiel starten: Wähle eine Vorlage und zeichne direkt auf dem Spielbogen.\n4. Spielmenü nutzen: Im Spiel kannst du das Menü-Icon gedrückt halten und an eine andere Position ziehen. Tippe zweimal auf das Icon, um das Menü zu öffnen.\n5. Letzten Schritt rückgängig: Nutze im Spiel die Aktion „Rückgängig", um den letzten Zeichen-Schritt zu entfernen.\n6. Hall of Fame: Speichere abgeschlossene Spiele zur späteren Ansicht.\n7. Support: support@dotzis.de</string>
 
     <!-- Template management -->
     <string name="btn_add_template">Vorlage hinzufügen</string>
