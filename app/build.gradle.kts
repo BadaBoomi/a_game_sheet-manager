@@ -5,14 +5,14 @@ plugins {
 
 android {
     namespace = "de.badaboomi.gamesheetmanager"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "de.dotzis.spielboegen_manger"
         minSdk = 26
-        targetSdk = 34
-        versionCode = 20
-        versionName = "1.8.2"
+        targetSdk = 35
+        versionCode = 21
+        versionName = "1.8.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
