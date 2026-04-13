@@ -8,6 +8,20 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
 
+    <!-- Bluetooth permissions for API <= 30 -->
+    <uses-permission android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"
+        android:maxSdkVersion="30" />
+    <!-- Bluetooth permissions for API >= 31 -->
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
+
+    <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
+
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -33,6 +47,16 @@
             android:name=".ui.templates.TemplateListActivity"
             android:exported="false"
             android:label="@string/title_templates" />
+
+        <activity
+            android:name=".bluetooth.BluetoothDeviceListActivity"
+            android:exported="false"
+            android:label="@string/title_bt_device_picker" />
+
+        <service
+            android:name=".bluetooth.TemplateReceiveService"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice" />
 
         <activity
             android:name=".ui.game.GameSheetActivity"

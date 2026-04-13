@@ -63,6 +63,19 @@ class TemplateRepository(context: Context) {
         return db.writableDatabase.insert(AppDatabase.TABLE_TEMPLATES, null, values)
     }
 
+    fun updateTemplate(template: Template): Int {
+        val values = ContentValues().apply {
+            put(AppDatabase.COL_TEMPLATE_NAME, template.name)
+            put(AppDatabase.COL_TEMPLATE_IMAGE_PATH, template.imagePath)
+        }
+        return db.writableDatabase.update(
+            AppDatabase.TABLE_TEMPLATES,
+            values,
+            "${AppDatabase.COL_TEMPLATE_ID} = ?",
+            arrayOf(template.id.toString())
+        )
+    }
+
     fun deleteTemplate(id: Long): Int {
         return db.writableDatabase.delete(
             AppDatabase.TABLE_TEMPLATES,

@@ -19,7 +19,12 @@
     <string name="btn_add_template">Vorlage hinzufügen</string>
     <string name="btn_delete">Löschen</string>
     <string name="btn_save">Speichern</string>
+    <string name="btn_edit">Bearbeiten</string>
+    <string name="btn_send_bluetooth">Per Bluetooth senden</string>
     <string name="dialog_add_template_title">Vorlage hinzufügen</string>
+    <string name="dialog_edit_template_title">Vorlage bearbeiten</string>
+    <string name="option_change_name">Namen ändern</string>
+    <string name="option_change_image">Bild ändern</string>
     <string name="dialog_template_name_title">Name der Vorlage</string>
     <string name="hint_template_name">Name eingeben…</string>
     <string name="default_template_name">Vorlage</string>
@@ -31,6 +36,7 @@
     <string name="msg_template_saved">Vorlage gespeichert</string>
     <string name="msg_template_save_error">Fehler beim Speichern der Vorlage</string>
     <string name="msg_template_deleted">Vorlage gelöscht</string>
+    <string name="msg_template_updated">Vorlage aktualisiert</string>
     <string name="msg_photo_failed">Fehler: Foto konnte nicht gespeichert werden</string>
     <string name="msg_photo_cancelled">Foto abgebrochen</string>
     <string name="msg_camera_permission_denied">Kamera-Berechtigung verweigert. Du kannst die Berechtigung in den App-Einstellungen ändern.</string>
@@ -38,6 +44,21 @@
     <string name="dialog_delete_template_message">Möchtest du die Vorlage „%s" wirklich löschen?</string>
     <string name="template_thumbnail_desc">Vorschaubild</string>
     <string name="empty_templates">Noch keine Vorlagen vorhanden.\n\nTippe auf + um eine Vorlage hinzuzufügen.</string>
+
+    <!-- Bluetooth transfer -->
+    <string name="title_bt_device_picker">Bluetooth-Gerät auswählen</string>
+    <string name="btn_discover_devices">Geräte suchen…</string>
+    <string name="empty_devices">Keine gekoppelten Geräte gefunden.\n\nTippe auf „Geräte suchen", um nach Geräten in der Nähe zu suchen.</string>
+    <string name="label_unknown_device">Unbekanntes Gerät</string>
+    <string name="msg_bt_not_supported">Dieses Gerät unterstützt kein Bluetooth.</string>
+    <string name="msg_bt_not_enabled">Bitte aktiviere Bluetooth und versuche es erneut.</string>
+    <string name="msg_bt_permission_denied">Bluetooth-Berechtigung verweigert.</string>
+    <string name="msg_template_sent">Vorlage „%s" erfolgreich gesendet.</string>
+    <string name="msg_template_send_error">Fehler beim Senden: %s</string>
+    <string name="msg_template_received">Vorlage „%s" empfangen und gespeichert.</string>
+    <string name="notification_channel_bt_receive">Bluetooth-Empfang</string>
+    <string name="notification_bt_receive_title">Vorlage empfangen</string>
+    <string name="notification_bt_receive_text">Warte auf eingehende Vorlagen…</string>
 
     <!-- Game sheet dialog -->
     <string name="dialog_existing_sheet_title">Bestehendes Spiel gefunden</string>

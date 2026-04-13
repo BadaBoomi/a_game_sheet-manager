@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import de.badaboomi.gamesheetmanager.R
+import de.badaboomi.gamesheetmanager.bluetooth.BluetoothDeviceListActivity
 import de.badaboomi.gamesheetmanager.data.GameSheet
 import de.badaboomi.gamesheetmanager.data.Template
 import de.badaboomi.gamesheetmanager.databinding.ActivityTemplateListBinding
@@ -36,6 +37,7 @@ class TemplateListActivity : AppCompatActivity() {
         const val MODE_MANAGE = "manage"
         const val MODE_SELECT = "select"
         private const val SAVED_CAMERA_FILE_PATH = "camera_file_path"
+        private const val SAVED_EDITING_TEMPLATE_ID = "editing_template_id"
     }
 
     private lateinit var binding: ActivityTemplateListBinding
@@ -46,6 +48,9 @@ class TemplateListActivity : AppCompatActivity() {
     private var mode = MODE_MANAGE
     private var cameraImageFile: File? = null
     private var pendingTemplateImageUri: Uri? = null
+
+    /** Non-null when the image-change flow was started for an existing template. */
+    private var editingTemplate: Template? = null
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -95,7 +100,12 @@ class TemplateListActivity : AppCompatActivity() {
         if (result.resultCode == RESULT_OK) {
             val outputUri = result.data?.let { UCrop.getOutput(it) }
             if (outputUri != null) {
-                handleImageSelected(outputUri)
+                val editing = editingTemplate
+                if (editing != null) {
+                    updateTemplateImage(editing, outputUri)
+                } else {
+                    handleImageSelected(outputUri)
+                }
             } else {
                 Toast.makeText(this, R.string.msg_crop_failed, Toast.LENGTH_SHORT).show()
             }
@@ -105,6 +115,7 @@ class TemplateListActivity : AppCompatActivity() {
             Toast.makeText(this, R.string.msg_crop_failed, Toast.LENGTH_SHORT).show()
         }
         pendingTemplateImageUri = null
+        editingTemplate = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -113,6 +124,10 @@ class TemplateListActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        mode = intent.getStringExtra(EXTRA_MODE) ?: MODE_MANAGE
+        templateRepository = TemplateRepository(this)
+        gameSheetRepository = GameSheetRepository(this)
 
         // Restore camera file path if activity was recreated
         if (savedInstanceState != null) {
@@ -123,11 +138,11 @@ class TemplateListActivity : AppCompatActivity() {
                     cameraImageFile = file
                 }
             }
+            val editingId = savedInstanceState.getLong(SAVED_EDITING_TEMPLATE_ID, -1L)
+            if (editingId >= 0) {
+                editingTemplate = templateRepository.getTemplateById(editingId)
+            }
         }
-
-        mode = intent.getStringExtra(EXTRA_MODE) ?: MODE_MANAGE
-        templateRepository = TemplateRepository(this)
-        gameSheetRepository = GameSheetRepository(this)
 
         val titleRes = if (mode == MODE_SELECT) R.string.title_select_template else R.string.title_templates
         supportActionBar?.title = getString(titleRes)
@@ -149,6 +164,9 @@ class TemplateListActivity : AppCompatActivity() {
         cameraImageFile?.let {
             outState.putString(SAVED_CAMERA_FILE_PATH, it.absolutePath)
         }
+        editingTemplate?.let {
+            outState.putLong(SAVED_EDITING_TEMPLATE_ID, it.id)
+        }
     }
 
     override fun onResume() {
@@ -161,6 +179,8 @@ class TemplateListActivity : AppCompatActivity() {
             templates = templates,
             onItemClick = { template -> onTemplateClicked(template) },
             onDeleteClick = { template -> confirmDeleteTemplate(template) },
+            onEditClick = { template -> showEditTemplateDialog(template) },
+            onSendClick = { template -> sendTemplateViaBluetooth(template) },
             showDeleteButton = mode == MODE_MANAGE
         )
         binding.listTemplates.adapter = adapter
@@ -230,6 +250,84 @@ class TemplateListActivity : AppCompatActivity() {
             .show()
     }
 
+    // -------------------------------------------------------------------------
+    // Edit template
+    // -------------------------------------------------------------------------
+
+    private fun showEditTemplateDialog(template: Template) {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.dialog_edit_template_title)
+            .setItems(
+                arrayOf(
+                    getString(R.string.option_change_name),
+                    getString(R.string.option_change_image)
+                )
+            ) { _, which ->
+                when (which) {
+                    0 -> showEditNameDialog(template)
+                    1 -> startEditImageFlow(template)
+                }
+            }
+            .show()
+    }
+
+    private fun showEditNameDialog(template: Template) {
+        val editText = android.widget.EditText(this).apply {
+            hint = getString(R.string.hint_template_name)
+            setText(template.name)
+            setPadding(48, 24, 48, 24)
+        }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.dialog_template_name_title)
+            .setView(editText)
+            .setPositiveButton(R.string.btn_save) { _, _ ->
+                val newName = editText.text.toString().trim()
+                    .ifEmpty { getString(R.string.default_template_name) }
+                val updated = template.copy(name = newName)
+                templateRepository.updateTemplate(updated)
+                loadTemplates()
+                Toast.makeText(this, R.string.msg_template_updated, Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun startEditImageFlow(template: Template) {
+        editingTemplate = template
+        showAddTemplateDialog()
+    }
+
+    private fun updateTemplateImage(template: Template, newImageUri: Uri) {
+        val oldImagePath = template.imagePath
+        val newImagePath = FileUtils.copyImageToTemplatesDir(this, newImageUri)
+        if (newImagePath != null) {
+            val updated = template.copy(imagePath = newImagePath)
+            templateRepository.updateTemplate(updated)
+            FileUtils.deleteFile(oldImagePath)
+            loadTemplates()
+            Toast.makeText(this, R.string.msg_template_updated, Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, R.string.msg_template_save_error, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Bluetooth send
+    // -------------------------------------------------------------------------
+
+    private fun sendTemplateViaBluetooth(template: Template) {
+        val intent = Intent(this, BluetoothDeviceListActivity::class.java).apply {
+            putExtra(BluetoothDeviceListActivity.EXTRA_TEMPLATE_ID, template.id)
+            putExtra(BluetoothDeviceListActivity.EXTRA_TEMPLATE_NAME, template.name)
+            putExtra(BluetoothDeviceListActivity.EXTRA_TEMPLATE_IMAGE_PATH, template.imagePath)
+        }
+        startActivity(intent)
+    }
+
+    // -------------------------------------------------------------------------
+    // Camera / gallery / crop helpers
+    // -------------------------------------------------------------------------
+
     private fun takePhoto() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
             == android.content.pm.PackageManager.PERMISSION_GRANTED
@@ -276,9 +374,23 @@ class TemplateListActivity : AppCompatActivity() {
             cropLauncher.launch(cropIntent)
         } catch (_: ActivityNotFoundException) {
             Toast.makeText(this, R.string.msg_crop_failed, Toast.LENGTH_SHORT).show()
-            handleImageSelected(sourceUri)
+            fallbackFromCrop(sourceUri)
         } catch (_: Exception) {
             Toast.makeText(this, R.string.msg_crop_failed, Toast.LENGTH_SHORT).show()
+            fallbackFromCrop(sourceUri)
+        }
+    }
+
+    /**
+     * Handles the case where the crop flow fails or is unavailable.
+     * Routes to either the template-update path or the new-template path.
+     */
+    private fun fallbackFromCrop(sourceUri: Uri) {
+        val editing = editingTemplate
+        if (editing != null) {
+            editingTemplate = null
+            updateTemplateImage(editing, sourceUri)
+        } else {
             handleImageSelected(sourceUri)
         }
     }
