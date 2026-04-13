@@ -42,13 +42,13 @@ class MainActivity : AppCompatActivity() {
             showUsageGuide()
         }
 
-        binding.tvContactEmail.setOnClickListener {
+        binding.tvContact.setOnClickListener {
             val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:${getString(R.string.support_email)}"))
             startActivity(Intent.createChooser(intent, null))
         }
 
         // Display version info
-        binding.tvVersion.text = getString(R.string.version_label, BuildConfig.VERSION_NAME)
+        binding.tvVersion.text = getString(R.string.version_copyright, BuildConfig.VERSION_NAME)
     }
 
     private fun showUsageGuide() {
