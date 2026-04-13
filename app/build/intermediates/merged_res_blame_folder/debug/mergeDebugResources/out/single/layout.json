@@ -1,0 +1,38 @@
+[
+    {
+        "merged": "C:\\Users\\Heiko\\.gradle\\daemon\\9.3.1\\de.badaboomi.gamesheetmanager.app-mergeDebugResources-31:\\layout\\activity_main.xml",
+        "source": "C:\\Users\\Heiko\\.gradle\\daemon\\9.3.1\\de.badaboomi.gamesheetmanager.app-main-34:\\layout\\activity_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\Heiko\\.gradle\\daemon\\9.3.1\\de.badaboomi.gamesheetmanager.app-mergeDebugResources-31:\\layout\\item_hall_of_fame.xml",
+        "source": "C:\\Users\\Heiko\\.gradle\\daemon\\9.3.1\\de.badaboomi.gamesheetmanager.app-main-34:\\layout\\item_hall_of_fame.xml"
+    },
+    {
+        "merged": "C:\\Users\\Heiko\\.gradle\\daemon\\9.3.1\\de.badaboomi.gamesheetmanager.app-mergeDebugResources-31:\\layout\\activity_hall_of_fame.xml",
+        "source": "C:\\Users\\Heiko\\.gradle\\daemon\\9.3.1\\de.badaboomi.gamesheetmanager.app-main-34:\\layout\\activity_hall_of_fame.xml"
+    },
+    {
+        "merged": "C:\\Users\\Heiko\\.gradle\\daemon\\9.3.1\\de.badaboomi.gamesheetmanager.app-mergeDebugResources-31:\\layout\\activity_game_sheet.xml",
+        "source": "C:\\Users\\Heiko\\.gradle\\daemon\\9.3.1\\de.badaboomi.gamesheetmanager.app-main-34:\\layout\\activity_game_sheet.xml"
+    },
+    {
+        "merged": "C:\\Users\\Heiko\\.gradle\\daemon\\9.3.1\\de.badaboomi.gamesheetmanager.app-mergeDebugResources-31:\\layout\\activity_bluetooth_device_list.xml",
+        "source": "C:\\Users\\Heiko\\.gradle\\daemon\\9.3.1\\de.badaboomi.gamesheetmanager.app-main-34:\\layout\\activity_bluetooth_device_list.xml"
+    },
+    {
+        "merged": "de.badaboomi.gamesheetmanager.app-mergeDebugResources-31:/layout/activity_main.xml",
+        "source": "de.badaboomi.gamesheetmanager.app-main-34:/layout/activity_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\Heiko\\.gradle\\daemon\\9.3.1\\de.badaboomi.gamesheetmanager.app-mergeDebugResources-31:\\layout\\activity_hall_of_fame_view.xml",
+        "source": "C:\\Users\\Heiko\\.gradle\\daemon\\9.3.1\\de.badaboomi.gamesheetmanager.app-main-34:\\layout\\activity_hall_of_fame_view.xml"
+    },
+    {
+        "merged": "C:\\Users\\Heiko\\.gradle\\daemon\\9.3.1\\de.badaboomi.gamesheetmanager.app-mergeDebugResources-31:\\layout\\activity_template_list.xml",
+        "source": "C:\\Users\\Heiko\\.gradle\\daemon\\9.3.1\\de.badaboomi.gamesheetmanager.app-main-34:\\layout\\activity_template_list.xml"
+    },
+    {
+        "merged": "C:\\Users\\Heiko\\.gradle\\daemon\\9.3.1\\de.badaboomi.gamesheetmanager.app-mergeDebugResources-31:\\layout\\item_template.xml",
+        "source": "C:\\Users\\Heiko\\.gradle\\daemon\\9.3.1\\de.badaboomi.gamesheetmanager.app-main-34:\\layout\\item_template.xml"
+    }
+]

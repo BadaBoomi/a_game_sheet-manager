@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="de.badaboomi.gamesheetmanager.DrawingSerializerTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-04-13T10:35:55.457Z" hostname="PINOCCHIO" time="0.035">
+  <properties/>
+  <testcase name="deserialize empty JSON array returns empty list" classname="de.badaboomi.gamesheetmanager.DrawingSerializerTest" time="0.004"/>
+  <testcase name="serialize empty list returns empty JSON array" classname="de.badaboomi.gamesheetmanager.DrawingSerializerTest" time="0.011"/>
+  <testcase name="deserialize invalid JSON returns empty list" classname="de.badaboomi.gamesheetmanager.DrawingSerializerTest" time="0.001"/>
+  <testcase name="deserialize malformed JSON returns empty list" classname="de.badaboomi.gamesheetmanager.DrawingSerializerTest" time="0.0"/>
+  <testcase name="serialize and deserialize roundtrip preserves data" classname="de.badaboomi.gamesheetmanager.DrawingSerializerTest" time="0.013"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,8 @@
+de.badaboomi.gamesheetmanager.app-pngs-0 C:\Users\Heiko\git\a_game_sheet-manager\app\build\generated\res\pngs\debug
+de.badaboomi.gamesheetmanager.app-resValues-1 C:\Users\Heiko\git\a_game_sheet-manager\app\build\generated\res\resValues\debug
+de.badaboomi.gamesheetmanager.app-updated_navigation_xml-2 C:\Users\Heiko\git\a_game_sheet-manager\app\build\generated\updated_navigation_xml\debug
+de.badaboomi.gamesheetmanager.app-packageDebugResources-3 C:\Users\Heiko\git\a_game_sheet-manager\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+de.badaboomi.gamesheetmanager.app-packageDebugResources-4 C:\Users\Heiko\git\a_game_sheet-manager\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+de.badaboomi.gamesheetmanager.app-debug-5 C:\Users\Heiko\git\a_game_sheet-manager\app\build\intermediates\merged_res\debug\mergeDebugResources
+de.badaboomi.gamesheetmanager.app-debug-6 C:\Users\Heiko\git\a_game_sheet-manager\app\src\debug\res
+de.badaboomi.gamesheetmanager.app-main-7 C:\Users\Heiko\git\a_game_sheet-manager\app\src\main\res
