@@ -93,30 +93,32 @@ object BluetoothSendManager {
                 val startTime = System.currentTimeMillis()
                 Log.d(TAG, "transfer begin: bytes=$totalSize")
 
-                DataOutputStream(socket.outputStream).use { out ->
-                    out.writeUTF(BluetoothConstants.PROTOCOL_HEADER)
-                    out.writeUTF(template.name)
-                    out.writeLong(totalSize.toLong())
-                    val bufferSize = 8192
-                    var written = 0
-                    while (written < totalSize) {
-                        val chunkSize = minOf(bufferSize, totalSize - written)
-                        out.write(imageBytes, written, chunkSize)
-                        written += chunkSize
-                        val percent = (written * 100L / totalSize).toInt()
-                        val elapsed = System.currentTimeMillis() - startTime
-                        val secondsLeft = if (written > 0 && elapsed > 500) {
-                            val bytesPerMs = written.toDouble() / elapsed
-                            ((totalSize - written) / bytesPerMs / 1000).toInt().coerceAtLeast(0)
-                        } else -1
-                        onProgress(percent, secondsLeft)
-                        if (percent == 100 || percent / 10 > lastLoggedPercent / 10) {
-                            lastLoggedPercent = percent
-                            Log.d(TAG, "progress: $percent%, eta=${secondsLeft}s")
-                        }
+                // Do NOT wrap with .use {} — closing DataOutputStream closes the Bluetooth socket
+                // output stream immediately, causing the receiver to get EOF mid-read.
+                // The socket is closed in the finally block below.
+                val out = DataOutputStream(socket.outputStream)
+                out.writeUTF(BluetoothConstants.PROTOCOL_HEADER)
+                out.writeUTF(template.name)
+                out.writeLong(totalSize.toLong())
+                val bufferSize = 8192
+                var written = 0
+                while (written < totalSize) {
+                    val chunkSize = minOf(bufferSize, totalSize - written)
+                    out.write(imageBytes, written, chunkSize)
+                    written += chunkSize
+                    val percent = (written * 100L / totalSize).toInt()
+                    val elapsed = System.currentTimeMillis() - startTime
+                    val secondsLeft = if (written > 0 && elapsed > 500) {
+                        val bytesPerMs = written.toDouble() / elapsed
+                        ((totalSize - written) / bytesPerMs / 1000).toInt().coerceAtLeast(0)
+                    } else -1
+                    onProgress(percent, secondsLeft)
+                    if (percent == 100 || percent / 10 > lastLoggedPercent / 10) {
+                        lastLoggedPercent = percent
+                        Log.d(TAG, "progress: $percent%, eta=${secondsLeft}s")
                     }
-                    out.flush()
                 }
+                out.flush()
                 Log.d(TAG, "transfer complete: template=${template.name}, device=${device.address}")
             } catch (e: Exception) {
                 failure = e
