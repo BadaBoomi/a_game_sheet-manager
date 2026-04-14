@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import de.badaboomi.gamesheetmanager.R
@@ -43,6 +44,7 @@ class BluetoothDeviceListActivity : AppCompatActivity() {
     private val devices = mutableListOf<BluetoothDevice>()
     private lateinit var deviceAdapter: DeviceAdapter
     private var templateToSend: Template? = null
+    private var sendingDialog: AlertDialog? = null
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -187,6 +189,13 @@ class BluetoothDeviceListActivity : AppCompatActivity() {
         binding.listDevices.isEnabled = false
         binding.btnDiscovery.isEnabled = false
 
+        sendingDialog?.dismiss()
+        sendingDialog = AlertDialog.Builder(this)
+            .setTitle(R.string.dialog_bt_sending_title)
+            .setMessage(getString(R.string.msg_bt_sending_start))
+            .setCancelable(false)
+            .show()
+
         @Suppress("MissingPermission")
         bluetoothAdapter?.cancelDiscovery()
 
@@ -196,17 +205,21 @@ class BluetoothDeviceListActivity : AppCompatActivity() {
             onProgress = { percent, secondsLeft ->
                 runOnUiThread {
                     binding.progressSending.progress = percent
-                    binding.tvSendProgress.text = if (secondsLeft >= 0) {
+                    val progressText = if (secondsLeft >= 0) {
                         getString(R.string.msg_bt_sending_progress, percent, secondsLeft)
                     } else {
                         getString(R.string.msg_bt_sending_pct, percent)
                     }
+                    binding.tvSendProgress.text = progressText
+                    sendingDialog?.setMessage(progressText)
                 }
             },
             onSuccess = {
                 runOnUiThread {
                     binding.progressSending.visibility = View.GONE
                     binding.tvSendProgress.visibility = View.GONE
+                    sendingDialog?.dismiss()
+                    sendingDialog = null
                     Toast.makeText(
                         this,
                         getString(R.string.msg_template_sent, template.name),
@@ -219,6 +232,8 @@ class BluetoothDeviceListActivity : AppCompatActivity() {
                 runOnUiThread {
                     binding.progressSending.visibility = View.GONE
                     binding.tvSendProgress.visibility = View.GONE
+                    sendingDialog?.dismiss()
+                    sendingDialog = null
                     binding.listDevices.isEnabled = true
                     binding.btnDiscovery.isEnabled = true
                     Toast.makeText(
@@ -232,6 +247,8 @@ class BluetoothDeviceListActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        sendingDialog?.dismiss()
+        sendingDialog = null
         try {
             unregisterReceiver(discoveryReceiver)
         } catch (_: IllegalArgumentException) {
