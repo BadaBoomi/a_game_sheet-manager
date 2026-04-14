@@ -32,6 +32,7 @@ object BluetoothSendManager {
     ) {
         Thread {
             var socket: BluetoothSocket? = null
+            var failure: Exception? = null
             try {
                 socket = device.createRfcommSocketToServiceRecord(BluetoothConstants.SERVICE_UUID)
                 socket.connect()
@@ -65,15 +66,19 @@ object BluetoothSendManager {
                     }
                     out.flush()
                 }
-
-                onSuccess()
             } catch (e: Exception) {
-                onError(e)
+                failure = e
             } finally {
                 try {
                     socket?.close()
                 } catch (_: IOException) {
                 }
+            }
+
+            if (failure == null) {
+                onSuccess()
+            } else {
+                onError(failure!!)
             }
         }.start()
     }

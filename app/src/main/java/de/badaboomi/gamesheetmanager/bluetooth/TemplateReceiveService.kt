@@ -105,7 +105,7 @@ class TemplateReceiveService : Service() {
                 val socket: BluetoothSocket = try {
                     serverSocket?.accept() ?: break
                 } catch (e: IOException) {
-                    break
+                    if (running) continue else break
                 }
                 handleIncoming(socket)
             }
