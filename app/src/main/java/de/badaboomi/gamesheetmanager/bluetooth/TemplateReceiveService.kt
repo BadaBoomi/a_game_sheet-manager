@@ -125,71 +125,83 @@ class TemplateReceiveService : Service() {
     private fun handleIncoming(socket: BluetoothSocket) {
         var lastLoggedPercent = -1
         try {
-            DataInputStream(socket.inputStream).use { input ->
-                val header = input.readUTF()
-                if (header != BluetoothConstants.PROTOCOL_HEADER) {
-                    Log.w(TAG, "invalid protocol header: $header")
-                    return
-                }
+            // Do NOT use DataInputStream.use {} — closing it closes the Bluetooth socket
+            // before we can send the ACK byte back to the sender.
+            val input = DataInputStream(socket.inputStream)
 
-                val name = input.readUTF()
-                val imageSize = input.readLong()
-                Log.d(TAG, "receive start: name=$name, bytes=$imageSize")
+            val header = input.readUTF()
+            if (header != BluetoothConstants.PROTOCOL_HEADER) {
+                Log.w(TAG, "invalid protocol header: $header")
+                return
+            }
 
-                if (imageSize <= 0 || imageSize > 50 * 1024 * 1024L) {
-                    Log.w(TAG, "invalid image size: $imageSize")
-                    return
-                }
+            val name = input.readUTF()
+            val imageSize = input.readLong()
+            Log.d(TAG, "receive start: name=$name, bytes=$imageSize")
 
-                val imageBytes = ByteArray(imageSize.toInt())
-                val startTime = System.currentTimeMillis()
-                var offset = 0
-                while (offset < imageBytes.size) {
-                    val read = input.read(imageBytes, offset, imageBytes.size - offset)
-                    if (read < 0) break
-                    offset += read
-                    val percent = (offset * 100L / imageBytes.size).toInt()
-                    val elapsed = System.currentTimeMillis() - startTime
-                    val secondsLeft = if (offset > 0 && elapsed > 500) {
-                        val bytesPerMs = offset.toDouble() / elapsed
-                        ((imageBytes.size - offset) / bytesPerMs / 1000).toInt().coerceAtLeast(0)
-                    } else -1
-                    sendBroadcast(
-                        Intent(ACTION_RECEIVE_PROGRESS).apply {
-                            `package` = packageName
-                            putExtra(EXTRA_PROGRESS_PERCENT, percent)
-                            putExtra(EXTRA_SECONDS_LEFT, secondsLeft)
-                        }
-                    )
-                    if (percent == 100 || percent / 10 > lastLoggedPercent / 10) {
-                        lastLoggedPercent = percent
-                        Log.d(TAG, "receive progress: $percent%, eta=${secondsLeft}s")
-                    }
-                }
+            if (imageSize <= 0 || imageSize > 50 * 1024 * 1024L) {
+                Log.w(TAG, "invalid image size: $imageSize")
+                return
+            }
 
-                if (offset != imageBytes.size) {
-                    Log.w(TAG, "incomplete receive: read=$offset expected=${imageBytes.size}")
-                    return
-                }
-
-                val destFile = FileUtils.createTemplateImageFile(this)
-                FileOutputStream(destFile).use { it.write(imageBytes) }
-
-                val template = Template(name = name, imagePath = destFile.absolutePath)
-                TemplateRepository(this).insertTemplate(template)
-                Log.d(TAG, "receive complete: name=$name, path=${destFile.absolutePath}")
-
+            val imageBytes = ByteArray(imageSize.toInt())
+            val startTime = System.currentTimeMillis()
+            var offset = 0
+            while (offset < imageBytes.size) {
+                val read = input.read(imageBytes, offset, imageBytes.size - offset)
+                if (read < 0) break
+                offset += read
+                val percent = (offset * 100L / imageBytes.size).toInt()
+                val elapsed = System.currentTimeMillis() - startTime
+                val secondsLeft = if (offset > 0 && elapsed > 500) {
+                    val bytesPerMs = offset.toDouble() / elapsed
+                    ((imageBytes.size - offset) / bytesPerMs / 1000).toInt().coerceAtLeast(0)
+                } else -1
                 sendBroadcast(
-                    Intent(ACTION_TEMPLATE_RECEIVED).apply { `package` = packageName }
+                    Intent(ACTION_RECEIVE_PROGRESS).apply {
+                        `package` = packageName
+                        putExtra(EXTRA_PROGRESS_PERCENT, percent)
+                        putExtra(EXTRA_SECONDS_LEFT, secondsLeft)
+                    }
                 )
-
-                mainThread {
-                    Toast.makeText(
-                        this,
-                        getString(R.string.msg_template_received, name),
-                        Toast.LENGTH_LONG
-                    ).show()
+                if (percent == 100 || percent / 10 > lastLoggedPercent / 10) {
+                    lastLoggedPercent = percent
+                    Log.d(TAG, "receive progress: $percent%, eta=${secondsLeft}s")
                 }
+            }
+
+            if (offset != imageBytes.size) {
+                Log.w(TAG, "incomplete receive: read=$offset expected=${imageBytes.size}")
+                return
+            }
+
+            val destFile = FileUtils.createTemplateImageFile(this)
+            FileOutputStream(destFile).use { it.write(imageBytes) }
+
+            val template = Template(name = name, imagePath = destFile.absolutePath)
+            TemplateRepository(this).insertTemplate(template)
+            Log.d(TAG, "receive complete: name=$name, path=${destFile.absolutePath}")
+
+            // Send 1-byte ACK so the sender knows all data was consumed and it
+            // is safe to close the socket without discarding buffered bytes.
+            try {
+                socket.outputStream.write(1)
+                socket.outputStream.flush()
+                Log.d(TAG, "ack sent to sender")
+            } catch (e: IOException) {
+                Log.w(TAG, "failed to send ack", e)
+            }
+
+            sendBroadcast(
+                Intent(ACTION_TEMPLATE_RECEIVED).apply { `package` = packageName }
+            )
+
+            mainThread {
+                Toast.makeText(
+                    this,
+                    getString(R.string.msg_template_received, name),
+                    Toast.LENGTH_LONG
+                ).show()
             }
         } catch (e: IOException) {
             Log.e(TAG, "handleIncoming failed", e)

@@ -119,6 +119,15 @@ object BluetoothSendManager {
                     }
                 }
                 out.flush()
+                // Wait for 1-byte ACK from receiver before closing the socket.
+                // Closing immediately after flush() can discard bytes still queued
+                // in the Bluetooth TX stack that the receiver hasn't consumed yet.
+                try {
+                    socket.inputStream.read()
+                    Log.d(TAG, "ack received from receiver")
+                } catch (e: IOException) {
+                    Log.w(TAG, "ack wait failed (transfer may still be ok): ${e.message}")
+                }
                 Log.d(TAG, "transfer complete: template=${template.name}, device=${device.address}")
             } catch (e: Exception) {
                 failure = e
