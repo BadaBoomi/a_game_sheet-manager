@@ -66,13 +66,11 @@ class TemplateReceiveService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d(TAG, "service start command")
         startAccepting()
         return START_STICKY
     }
 
     override fun onDestroy() {
-        Log.d(TAG, "service destroy")
         running = false
         try {
             serverSocket?.close()
@@ -105,7 +103,6 @@ class TemplateReceiveService : Service() {
         }
 
         running = true
-        Log.d(TAG, "accept loop started")
         acceptThread = Thread {
             while (running) {
                 val socket: BluetoothSocket = try {
@@ -114,16 +111,13 @@ class TemplateReceiveService : Service() {
                     Log.w(TAG, "accept failed while running=$running", e)
                     if (running) continue else break
                 }
-                Log.d(TAG, "incoming connection accepted")
                 handleIncoming(socket)
             }
-            Log.d(TAG, "accept loop ended")
         }
         acceptThread?.start()
     }
 
     private fun handleIncoming(socket: BluetoothSocket) {
-        var lastLoggedPercent = -1
         try {
             // Do NOT use DataInputStream.use {} — closing it closes the Bluetooth socket
             // before we can send the ACK byte back to the sender.
@@ -137,7 +131,6 @@ class TemplateReceiveService : Service() {
 
             val name = input.readUTF()
             val imageSize = input.readLong()
-            Log.d(TAG, "receive start: name=$name, bytes=$imageSize")
 
             if (imageSize <= 0 || imageSize > 50 * 1024 * 1024L) {
                 Log.w(TAG, "invalid image size: $imageSize")
@@ -164,10 +157,6 @@ class TemplateReceiveService : Service() {
                         putExtra(EXTRA_SECONDS_LEFT, secondsLeft)
                     }
                 )
-                if (percent == 100 || percent / 10 > lastLoggedPercent / 10) {
-                    lastLoggedPercent = percent
-                    Log.d(TAG, "receive progress: $percent%, eta=${secondsLeft}s")
-                }
             }
 
             if (offset != imageBytes.size) {
@@ -180,14 +169,12 @@ class TemplateReceiveService : Service() {
 
             val template = Template(name = name, imagePath = destFile.absolutePath)
             TemplateRepository(this).insertTemplate(template)
-            Log.d(TAG, "receive complete: name=$name, path=${destFile.absolutePath}")
 
             // Send 1-byte ACK so the sender knows all data was consumed and it
             // is safe to close the socket without discarding buffered bytes.
             try {
                 socket.outputStream.write(1)
                 socket.outputStream.flush()
-                Log.d(TAG, "ack sent to sender")
             } catch (e: IOException) {
                 Log.w(TAG, "failed to send ack", e)
             }
@@ -208,7 +195,6 @@ class TemplateReceiveService : Service() {
         } finally {
             try {
                 socket.close()
-                Log.d(TAG, "incoming socket closed")
             } catch (_: IOException) {
                 Log.w(TAG, "incoming socket close failed")
             }

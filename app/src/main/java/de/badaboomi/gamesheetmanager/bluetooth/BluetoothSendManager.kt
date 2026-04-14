@@ -30,9 +30,7 @@ object BluetoothSendManager {
             var socket: BluetoothSocket? = null
             try {
                 socket = device.createRfcommSocketToServiceRecord(BluetoothConstants.SERVICE_UUID)
-                Log.d(TAG, "secure connect attempt ${attempt + 1}: device=${device.address}")
                 socket.connect()
-                Log.d(TAG, "secure connect success: device=${device.address}")
                 return socket
             } catch (e: Exception) {
                 lastError = e
@@ -49,9 +47,7 @@ object BluetoothSendManager {
             insecureSocket = device.createInsecureRfcommSocketToServiceRecord(
                 BluetoothConstants.SERVICE_UUID
             )
-            Log.d(TAG, "insecure connect attempt: device=${device.address}")
             insecureSocket.connect()
-            Log.d(TAG, "insecure connect success: device=${device.address}")
             return insecureSocket
         } catch (e: Exception) {
             try {
@@ -77,11 +73,8 @@ object BluetoothSendManager {
         Thread {
             var socket: BluetoothSocket? = null
             var failure: Exception? = null
-            var lastLoggedPercent = -1
             try {
-                Log.d(TAG, "send start: template=${template.name}, device=${device.address}")
                 socket = connectWithFallback(device)
-                Log.d(TAG, "connected: device=${device.address}")
 
                 val imageFile = File(template.imagePath)
                 if (!imageFile.exists()) {
@@ -91,7 +84,6 @@ object BluetoothSendManager {
                 val imageBytes = imageFile.readBytes()
                 val totalSize = imageBytes.size
                 val startTime = System.currentTimeMillis()
-                Log.d(TAG, "transfer begin: bytes=$totalSize")
 
                 // Do NOT wrap with .use {} — closing DataOutputStream closes the Bluetooth socket
                 // output stream immediately, causing the receiver to get EOF mid-read.
@@ -113,10 +105,6 @@ object BluetoothSendManager {
                         ((totalSize - written) / bytesPerMs / 1000).toInt().coerceAtLeast(0)
                     } else -1
                     onProgress(percent, secondsLeft)
-                    if (percent == 100 || percent / 10 > lastLoggedPercent / 10) {
-                        lastLoggedPercent = percent
-                        Log.d(TAG, "progress: $percent%, eta=${secondsLeft}s")
-                    }
                 }
                 out.flush()
                 // Wait for 1-byte ACK from receiver before closing the socket.
@@ -124,18 +112,15 @@ object BluetoothSendManager {
                 // in the Bluetooth TX stack that the receiver hasn't consumed yet.
                 try {
                     socket.inputStream.read()
-                    Log.d(TAG, "ack received from receiver")
                 } catch (e: IOException) {
                     Log.w(TAG, "ack wait failed (transfer may still be ok): ${e.message}")
                 }
-                Log.d(TAG, "transfer complete: template=${template.name}, device=${device.address}")
             } catch (e: Exception) {
                 failure = e
                 Log.e(TAG, "send failed: template=${template.name}, device=${device.address}", e)
             } finally {
                 try {
                     socket?.close()
-                    Log.d(TAG, "socket closed: device=${device.address}")
                 } catch (_: IOException) {
                     Log.w(TAG, "socket close failed: device=${device.address}")
                 }
