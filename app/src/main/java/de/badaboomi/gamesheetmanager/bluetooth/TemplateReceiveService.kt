@@ -29,12 +29,8 @@ import java.io.IOException
  * saves each received template to the local database.
  */
 class TemplateReceiveService : Service() {
-
-    private companion object {
-        const val TAG = "BtReceive"
-    }
-
     companion object {
+        private const val TAG = "BtReceive"
         const val CHANNEL_ID = "bluetooth_receive_channel"
         const val NOTIFICATION_ID = 1001
 
