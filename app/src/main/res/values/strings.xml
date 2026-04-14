@@ -69,6 +69,7 @@
     <string name="msg_bt_sending_progress">Sende… %1$d%% – noch ca. %2$d Sek.</string>
     <string name="msg_bt_receiving_pct">Empfange… %d%%</string>
     <string name="msg_bt_receiving_progress">Empfange… %1$d%% – noch ca. %2$d Sek.</string>
+    <string name="msg_bt_waiting_next">Vorlage empfangen. Warte auf weitere Vorlagen…</string>
     <string name="msg_template_received">Vorlage „%s" empfangen und gespeichert.</string>
     <string name="notification_channel_bt_receive">Bluetooth-Empfang</string>
     <string name="notification_bt_receive_title">Vorlage empfangen</string>

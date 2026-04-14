@@ -137,10 +137,8 @@ class TemplateListActivity : AppCompatActivity() {
 
     private val templateReceivedReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            stopBluetoothReceive()
-            receivingDialog?.dismiss()
-            receivingDialog = null
             loadTemplates()
+            receivingDialog?.setMessage(getString(R.string.msg_bt_waiting_next))
         }
     }
     private val progressReceiver = object : BroadcastReceiver() {
@@ -511,6 +509,10 @@ class TemplateListActivity : AppCompatActivity() {
     }
 
     private fun startBluetoothReceive() {
+        if (receiverRegistered || progressReceiverRegistered) {
+            stopBluetoothReceive()
+        }
+
         val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
         if (bluetoothManager?.adapter == null) {
             Toast.makeText(this, R.string.msg_bt_not_supported, Toast.LENGTH_LONG).show()
@@ -543,6 +545,7 @@ class TemplateListActivity : AppCompatActivity() {
             .setCancelable(false)
             .setNegativeButton(android.R.string.cancel) { _, _ ->
                 stopBluetoothReceive()
+                receivingDialog = null
             }
             .show()
     }
