@@ -11,6 +11,7 @@ import android.bluetooth.BluetoothSocket
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
+import android.util.Log
 import android.widget.Toast
 import de.badaboomi.gamesheetmanager.R
 import de.badaboomi.gamesheetmanager.data.Template
@@ -28,6 +29,10 @@ import java.io.IOException
  * saves each received template to the local database.
  */
 class TemplateReceiveService : Service() {
+
+    private companion object {
+        const val TAG = "BtReceive"
+    }
 
     companion object {
         const val CHANNEL_ID = "bluetooth_receive_channel"
@@ -65,11 +70,13 @@ class TemplateReceiveService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.d(TAG, "service start command")
         startAccepting()
         return START_STICKY
     }
 
     override fun onDestroy() {
+        Log.d(TAG, "service destroy")
         running = false
         try {
             serverSocket?.close()
@@ -84,6 +91,7 @@ class TemplateReceiveService : Service() {
         val bluetoothAdapter: BluetoothAdapter? = bluetoothManager?.adapter
 
         if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled) {
+            Log.w(TAG, "startAccepting aborted: adapter missing or disabled")
             stopSelf()
             return
         }
@@ -95,34 +103,47 @@ class TemplateReceiveService : Service() {
                 BluetoothConstants.SERVICE_UUID
             )
         } catch (e: IOException) {
+            Log.e(TAG, "listenUsingRfcommWithServiceRecord failed", e)
             stopSelf()
             return
         }
 
         running = true
+        Log.d(TAG, "accept loop started")
         acceptThread = Thread {
             while (running) {
                 val socket: BluetoothSocket = try {
                     serverSocket?.accept() ?: break
                 } catch (e: IOException) {
+                    Log.w(TAG, "accept failed while running=$running", e)
                     if (running) continue else break
                 }
+                Log.d(TAG, "incoming connection accepted")
                 handleIncoming(socket)
             }
+            Log.d(TAG, "accept loop ended")
         }
         acceptThread?.start()
     }
 
     private fun handleIncoming(socket: BluetoothSocket) {
+        var lastLoggedPercent = -1
         try {
             DataInputStream(socket.inputStream).use { input ->
                 val header = input.readUTF()
-                if (header != BluetoothConstants.PROTOCOL_HEADER) return
+                if (header != BluetoothConstants.PROTOCOL_HEADER) {
+                    Log.w(TAG, "invalid protocol header: $header")
+                    return
+                }
 
                 val name = input.readUTF()
                 val imageSize = input.readLong()
+                Log.d(TAG, "receive start: name=$name, bytes=$imageSize")
 
-                if (imageSize <= 0 || imageSize > 50 * 1024 * 1024L) return
+                if (imageSize <= 0 || imageSize > 50 * 1024 * 1024L) {
+                    Log.w(TAG, "invalid image size: $imageSize")
+                    return
+                }
 
                 val imageBytes = ByteArray(imageSize.toInt())
                 val startTime = System.currentTimeMillis()
@@ -144,15 +165,23 @@ class TemplateReceiveService : Service() {
                             putExtra(EXTRA_SECONDS_LEFT, secondsLeft)
                         }
                     )
+                    if (percent == 100 || percent / 10 > lastLoggedPercent / 10) {
+                        lastLoggedPercent = percent
+                        Log.d(TAG, "receive progress: $percent%, eta=${secondsLeft}s")
+                    }
                 }
 
-                if (offset != imageBytes.size) return
+                if (offset != imageBytes.size) {
+                    Log.w(TAG, "incomplete receive: read=$offset expected=${imageBytes.size}")
+                    return
+                }
 
                 val destFile = FileUtils.createTemplateImageFile(this)
                 FileOutputStream(destFile).use { it.write(imageBytes) }
 
                 val template = Template(name = name, imagePath = destFile.absolutePath)
                 TemplateRepository(this).insertTemplate(template)
+                Log.d(TAG, "receive complete: name=$name, path=${destFile.absolutePath}")
 
                 sendBroadcast(
                     Intent(ACTION_TEMPLATE_RECEIVED).apply { `package` = packageName }
@@ -166,11 +195,14 @@ class TemplateReceiveService : Service() {
                     ).show()
                 }
             }
-        } catch (_: IOException) {
+        } catch (e: IOException) {
+            Log.e(TAG, "handleIncoming failed", e)
         } finally {
             try {
                 socket.close()
+                Log.d(TAG, "incoming socket closed")
             } catch (_: IOException) {
+                Log.w(TAG, "incoming socket close failed")
             }
         }
     }
