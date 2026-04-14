@@ -26,6 +26,7 @@ object BluetoothSendManager {
     fun send(
         device: BluetoothDevice,
         template: Template,
+        onProgress: (percent: Int, secondsLeft: Int) -> Unit = { _, _ -> },
         onSuccess: () -> Unit,
         onError: (Exception) -> Unit
     ) {
@@ -41,12 +42,27 @@ object BluetoothSendManager {
                 }
 
                 val imageBytes = imageFile.readBytes()
+                val totalSize = imageBytes.size
+                val startTime = System.currentTimeMillis()
 
                 DataOutputStream(socket.outputStream).use { out ->
                     out.writeUTF(BluetoothConstants.PROTOCOL_HEADER)
                     out.writeUTF(template.name)
-                    out.writeLong(imageBytes.size.toLong())
-                    out.write(imageBytes)
+                    out.writeLong(totalSize.toLong())
+                    val bufferSize = 8192
+                    var written = 0
+                    while (written < totalSize) {
+                        val chunkSize = minOf(bufferSize, totalSize - written)
+                        out.write(imageBytes, written, chunkSize)
+                        written += chunkSize
+                        val percent = (written * 100L / totalSize).toInt()
+                        val elapsed = System.currentTimeMillis() - startTime
+                        val secondsLeft = if (written > 0 && elapsed > 500) {
+                            val bytesPerMs = written.toDouble() / elapsed
+                            ((totalSize - written) / bytesPerMs / 1000).toInt().coerceAtLeast(0)
+                        } else -1
+                        onProgress(percent, secondsLeft)
+                    }
                     out.flush()
                 }
 

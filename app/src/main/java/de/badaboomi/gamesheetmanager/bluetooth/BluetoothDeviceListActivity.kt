@@ -180,7 +180,10 @@ class BluetoothDeviceListActivity : AppCompatActivity() {
 
     private fun sendToDevice(device: BluetoothDevice) {
         val template = templateToSend ?: return
+        binding.progressSending.progress = 0
         binding.progressSending.visibility = View.VISIBLE
+        binding.tvSendProgress.text = getString(R.string.msg_bt_sending_start)
+        binding.tvSendProgress.visibility = View.VISIBLE
         binding.listDevices.isEnabled = false
         binding.btnDiscovery.isEnabled = false
 
@@ -190,9 +193,20 @@ class BluetoothDeviceListActivity : AppCompatActivity() {
         BluetoothSendManager.send(
             device = device,
             template = template,
+            onProgress = { percent, secondsLeft ->
+                runOnUiThread {
+                    binding.progressSending.progress = percent
+                    binding.tvSendProgress.text = if (secondsLeft >= 0) {
+                        getString(R.string.msg_bt_sending_progress, percent, secondsLeft)
+                    } else {
+                        getString(R.string.msg_bt_sending_pct, percent)
+                    }
+                }
+            },
             onSuccess = {
                 runOnUiThread {
                     binding.progressSending.visibility = View.GONE
+                    binding.tvSendProgress.visibility = View.GONE
                     Toast.makeText(
                         this,
                         getString(R.string.msg_template_sent, template.name),
@@ -204,6 +218,7 @@ class BluetoothDeviceListActivity : AppCompatActivity() {
             onError = { e ->
                 runOnUiThread {
                     binding.progressSending.visibility = View.GONE
+                    binding.tvSendProgress.visibility = View.GONE
                     binding.listDevices.isEnabled = true
                     binding.btnDiscovery.isEnabled = true
                     Toast.makeText(

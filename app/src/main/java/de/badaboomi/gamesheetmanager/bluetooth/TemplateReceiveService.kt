@@ -37,6 +37,12 @@ class TemplateReceiveService : Service() {
         const val ACTION_TEMPLATE_RECEIVED =
             "de.badaboomi.gamesheetmanager.ACTION_TEMPLATE_RECEIVED"
 
+        /** Broadcast action sent periodically during receive to report progress. */
+        const val ACTION_RECEIVE_PROGRESS =
+            "de.badaboomi.gamesheetmanager.ACTION_RECEIVE_PROGRESS"
+        const val EXTRA_PROGRESS_PERCENT = "progress_percent"
+        const val EXTRA_SECONDS_LEFT = "seconds_left"
+
         fun start(context: Context) {
             context.startForegroundService(Intent(context, TemplateReceiveService::class.java))
         }
@@ -119,11 +125,25 @@ class TemplateReceiveService : Service() {
                 if (imageSize <= 0 || imageSize > 50 * 1024 * 1024L) return
 
                 val imageBytes = ByteArray(imageSize.toInt())
+                val startTime = System.currentTimeMillis()
                 var offset = 0
                 while (offset < imageBytes.size) {
                     val read = input.read(imageBytes, offset, imageBytes.size - offset)
                     if (read < 0) break
                     offset += read
+                    val percent = (offset * 100L / imageBytes.size).toInt()
+                    val elapsed = System.currentTimeMillis() - startTime
+                    val secondsLeft = if (offset > 0 && elapsed > 500) {
+                        val bytesPerMs = offset.toDouble() / elapsed
+                        ((imageBytes.size - offset) / bytesPerMs / 1000).toInt().coerceAtLeast(0)
+                    } else -1
+                    sendBroadcast(
+                        Intent(ACTION_RECEIVE_PROGRESS).apply {
+                            `package` = packageName
+                            putExtra(EXTRA_PROGRESS_PERCENT, percent)
+                            putExtra(EXTRA_SECONDS_LEFT, secondsLeft)
+                        }
+                    )
                 }
 
                 if (offset != imageBytes.size) return

@@ -143,7 +143,20 @@ class TemplateListActivity : AppCompatActivity() {
             loadTemplates()
         }
     }
+    private val progressReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val percent = intent?.getIntExtra(TemplateReceiveService.EXTRA_PROGRESS_PERCENT, 0) ?: 0
+            val secondsLeft = intent?.getIntExtra(TemplateReceiveService.EXTRA_SECONDS_LEFT, -1) ?: -1
+            val msg = if (secondsLeft >= 0) {
+                getString(R.string.msg_bt_receiving_progress, percent, secondsLeft)
+            } else {
+                getString(R.string.msg_bt_receiving_pct, percent)
+            }
+            receivingDialog?.setMessage(msg)
+        }
+    }
     private var receiverRegistered = false
+    private var progressReceiverRegistered = false
     private var receivingDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -515,6 +528,13 @@ class TemplateListActivity : AppCompatActivity() {
         )
         receiverRegistered = true
 
+        val progressFilter = IntentFilter(TemplateReceiveService.ACTION_RECEIVE_PROGRESS)
+        ContextCompat.registerReceiver(
+            this, progressReceiver, progressFilter,
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        )
+        progressReceiverRegistered = true
+
         TemplateReceiveService.start(this)
 
         receivingDialog = AlertDialog.Builder(this)
@@ -534,6 +554,13 @@ class TemplateListActivity : AppCompatActivity() {
             } catch (_: IllegalArgumentException) {
             }
             receiverRegistered = false
+        }
+        if (progressReceiverRegistered) {
+            try {
+                unregisterReceiver(progressReceiver)
+            } catch (_: IllegalArgumentException) {
+            }
+            progressReceiverRegistered = false
         }
         TemplateReceiveService.stop(this)
     }
