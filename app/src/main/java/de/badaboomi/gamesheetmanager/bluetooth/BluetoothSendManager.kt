@@ -22,6 +22,47 @@ object BluetoothSendManager {
 
     private const val TAG = "BtSend"
 
+    @Suppress("MissingPermission")
+    private fun connectWithFallback(device: BluetoothDevice): BluetoothSocket {
+        var lastError: Exception? = null
+
+        repeat(2) { attempt ->
+            var socket: BluetoothSocket? = null
+            try {
+                socket = device.createRfcommSocketToServiceRecord(BluetoothConstants.SERVICE_UUID)
+                Log.d(TAG, "secure connect attempt ${attempt + 1}: device=${device.address}")
+                socket.connect()
+                Log.d(TAG, "secure connect success: device=${device.address}")
+                return socket
+            } catch (e: Exception) {
+                lastError = e
+                Log.w(TAG, "secure connect failed attempt ${attempt + 1}: device=${device.address}", e)
+                try {
+                    socket?.close()
+                } catch (_: IOException) {
+                }
+            }
+        }
+
+        var insecureSocket: BluetoothSocket? = null
+        try {
+            insecureSocket = device.createInsecureRfcommSocketToServiceRecord(
+                BluetoothConstants.SERVICE_UUID
+            )
+            Log.d(TAG, "insecure connect attempt: device=${device.address}")
+            insecureSocket.connect()
+            Log.d(TAG, "insecure connect success: device=${device.address}")
+            return insecureSocket
+        } catch (e: Exception) {
+            try {
+                insecureSocket?.close()
+            } catch (_: IOException) {
+            }
+            Log.e(TAG, "insecure connect failed: device=${device.address}", e)
+            throw lastError ?: e
+        }
+    }
+
     /**
      * Sends [template] to [device] on a background thread and reports results
      * via [onSuccess] / [onError] (called on the calling thread – post to UI handler if needed).
@@ -39,9 +80,7 @@ object BluetoothSendManager {
             var lastLoggedPercent = -1
             try {
                 Log.d(TAG, "send start: template=${template.name}, device=${device.address}")
-                socket = device.createRfcommSocketToServiceRecord(BluetoothConstants.SERVICE_UUID)
-                Log.d(TAG, "connecting: device=${device.address}")
-                socket.connect()
+                socket = connectWithFallback(device)
                 Log.d(TAG, "connected: device=${device.address}")
 
                 val imageFile = File(template.imagePath)
