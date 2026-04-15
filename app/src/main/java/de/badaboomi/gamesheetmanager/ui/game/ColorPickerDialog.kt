@@ -77,8 +77,8 @@ class ColorPickerDialog(
         container.addView(colorLabel)
 
         val colorGrid = GridLayout(ctx).apply {
-            columnCount = 6
-            rowCount = 2
+            columnCount = 4
+            rowCount = 3
         }
 
         for (color in predefinedColors) {

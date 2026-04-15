@@ -32,11 +32,22 @@
         android:visibility="visible">
 
         <ImageButton
-            android:id="@+id/btnMenuHandle"
+            android:id="@+id/btnPenStyle"
             android:layout_width="52dp"
             android:layout_height="52dp"
             android:padding="10dp"
             android:src="@drawable/ic_color_circle"
+            android:background="@drawable/bg_floating_menu"
+            android:contentDescription="@string/action_change_pen_style"
+            android:elevation="8dp" />
+
+        <ImageButton
+            android:id="@+id/btnMenuHandle"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_marginStart="8dp"
+            android:padding="10dp"
+            android:src="@drawable/ic_menu"
             android:background="@drawable/bg_floating_menu"
             android:contentDescription="@string/btn_floating_menu"
             android:elevation="8dp"

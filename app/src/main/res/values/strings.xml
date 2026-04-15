@@ -97,16 +97,16 @@
     <!-- Game sheet menu -->
     <string name="action_change_pen_style">Stiftgröße und Farbe ändern</string>
     <string name="action_save">Zwischenstand speichern</string>
-    <string name="action_finish_game">Spiel beenden</string>
-    <string name="action_finish_and_save_hof">Spiel beenden und in Hall of Fame speichern</string>
+    <string name="action_finish_game">Beenden</string>
+    <string name="action_finish_and_save_hof">Beenden und in Hall of Fame speichern</string>
     <string name="action_save_and_finish">Speichern und beenden</string>
-    <string name="action_finish_without_save">Spiel ohne Speichern beenden</string>
+    <string name="action_finish_without_save">Ohne Speichern beenden</string>
     <string name="msg_sheet_saved">Zwischenstand gespeichert</string>
 
     <!-- Hall of Fame -->
-    <string name="dialog_finish_game_title">Spiel beenden</string>
+    <string name="dialog_finish_game_title">Beenden</string>
     <string name="dialog_finish_game_message">Gib dem Spiel einen Namen und speichere es in der Hall of Fame.</string>
-    <string name="dialog_finish_without_save_title">Spiel ohne Speichern beenden?</string>
+    <string name="dialog_finish_without_save_title">Ohne Speichern beenden?</string>
     <string name="dialog_finish_without_save_message">Dieses Spiel wird verworfen und nicht gespeichert.</string>
     <string name="hint_game_name">Spielname eingeben…</string>
     <string name="btn_save_to_hof">In Hall of Fame speichern</string>

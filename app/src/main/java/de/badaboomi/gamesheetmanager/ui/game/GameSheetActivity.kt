@@ -30,7 +30,6 @@ class GameSheetActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_SHEET_ID = "sheet_id"
-        const val MENU_ITEM_STYLE = 1
         const val MENU_ITEM_SAVE = 2
         const val MENU_ITEM_FINISH_AND_SAVE = 3
         const val MENU_ITEM_SAVE_AND_FINISH = 4
@@ -84,7 +83,10 @@ class GameSheetActivity : AppCompatActivity() {
 
     private fun setupFloatingMenuButton() {
         val menuButton = binding.btnMenuHandle
-        menuButton.setColorFilter(binding.drawingView.penColor)
+        binding.btnPenStyle.setColorFilter(binding.drawingView.penColor)
+        binding.btnPenStyle.setOnClickListener {
+            showColorPicker()
+        }
         binding.btnQuickUndo.setOnClickListener {
             binding.drawingView.undoLastStroke()
         }
@@ -147,19 +149,13 @@ class GameSheetActivity : AppCompatActivity() {
 
     private fun showFloatingMenu() {
         PopupMenu(this, binding.btnMenuHandle).apply {
-            menu.add(0, MENU_ITEM_STYLE, 0, getString(R.string.action_change_pen_style))
-            menu.add(0, MENU_ITEM_SAVE, 1, getString(R.string.action_save))
-            menu.add(0, MENU_ITEM_FINISH_AND_SAVE, 2, getString(R.string.action_finish_and_save_hof))
-            menu.add(0, MENU_ITEM_SAVE_AND_FINISH, 3, getString(R.string.action_save_and_finish))
-            menu.add(0, MENU_ITEM_FINISH_WITHOUT_SAVE, 4, getString(R.string.action_finish_without_save))
+            menu.add(0, MENU_ITEM_SAVE, 0, getString(R.string.action_save))
+            menu.add(0, MENU_ITEM_FINISH_AND_SAVE, 1, getString(R.string.action_finish_and_save_hof))
+            menu.add(0, MENU_ITEM_SAVE_AND_FINISH, 2, getString(R.string.action_save_and_finish))
+            menu.add(0, MENU_ITEM_FINISH_WITHOUT_SAVE, 3, getString(R.string.action_finish_without_save))
 
             setOnMenuItemClickListener { item ->
                 when (item.itemId) {
-                    MENU_ITEM_STYLE -> {
-                        showColorPicker()
-                        true
-                    }
-
                     MENU_ITEM_SAVE -> {
                         saveCurrentState()
                         true
@@ -194,7 +190,7 @@ class GameSheetActivity : AppCompatActivity() {
         ) { color, width ->
             binding.drawingView.penColor = color
             binding.drawingView.penWidth = width
-            binding.btnMenuHandle.setColorFilter(color)
+            binding.btnPenStyle.setColorFilter(color)
         }.show()
     }
 
