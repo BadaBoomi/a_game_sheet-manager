@@ -41,6 +41,7 @@ class ColorPickerDialog(
 
     private var selectedColor = currentColor
     private var selectedWidth = currentWidth
+    private var widthPreviewView: ImageView? = null
 
     init {
         buildUI()
@@ -101,6 +102,7 @@ class ColorPickerDialog(
                 setOnClickListener {
                     selectedColor = color
                     updateColorSelection(colorGrid, this)
+                    (widthPreviewView?.background as? GradientDrawable)?.setColor(selectedColor)
                 }
             }
             colorGrid.addView(colorView)
@@ -122,6 +124,7 @@ class ColorPickerDialog(
             shape.cornerRadius = selectedWidth
             shape.setColor(selectedColor)
             background = shape
+            widthPreviewView = this
             layoutParams = LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 (selectedWidth * dp).toInt().coerceAtLeast((8 * dp).toInt())

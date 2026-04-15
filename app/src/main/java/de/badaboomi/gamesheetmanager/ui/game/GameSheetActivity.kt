@@ -7,11 +7,13 @@ import android.view.GestureDetector
 import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
-import android.widget.PopupMenu
 import android.widget.Toast
+import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GestureDetectorCompat
+import com.google.android.material.button.MaterialButton
 import de.badaboomi.gamesheetmanager.MainActivity
 import de.badaboomi.gamesheetmanager.R
 import de.badaboomi.gamesheetmanager.data.GameSheet
@@ -30,10 +32,6 @@ class GameSheetActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_SHEET_ID = "sheet_id"
-        const val MENU_ITEM_SAVE = 2
-        const val MENU_ITEM_FINISH_AND_SAVE = 3
-        const val MENU_ITEM_SAVE_AND_FINISH = 4
-        const val MENU_ITEM_FINISH_WITHOUT_SAVE = 5
     }
 
     private lateinit var binding: ActivityGameSheetBinding
@@ -97,6 +95,7 @@ class GameSheetActivity : AppCompatActivity() {
                 override fun onDown(e: MotionEvent): Boolean = true
 
                 override fun onDoubleTap(e: MotionEvent): Boolean {
+                override fun onSingleTapUp(e: MotionEvent): Boolean {
                     showFloatingMenu()
                     return true
                 }
@@ -148,38 +147,30 @@ class GameSheetActivity : AppCompatActivity() {
     }
 
     private fun showFloatingMenu() {
-        PopupMenu(this, binding.btnMenuHandle).apply {
-            menu.add(0, MENU_ITEM_SAVE, 0, getString(R.string.action_save))
-            menu.add(0, MENU_ITEM_FINISH_AND_SAVE, 1, getString(R.string.action_finish_and_save_hof))
-            menu.add(0, MENU_ITEM_SAVE_AND_FINISH, 2, getString(R.string.action_save_and_finish))
-            menu.add(0, MENU_ITEM_FINISH_WITHOUT_SAVE, 3, getString(R.string.action_finish_without_save))
+        val dp = resources.displayMetrics.density
+        val layout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding((16 * dp).toInt(), (8 * dp).toInt(), (16 * dp).toInt(), (8 * dp).toInt())
+        }
+        val dialog = AlertDialog.Builder(this).setView(layout).create()
 
-            setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    MENU_ITEM_SAVE -> {
-                        saveCurrentState()
-                        true
-                    }
+        fun addButton(label: String, action: () -> Unit) {
+            layout.addView(MaterialButton(this).apply {
+                text = label
+                layoutParams = LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                ).apply { setMargins(0, (4 * dp).toInt(), 0, (4 * dp).toInt()) }
+                setOnClickListener { dialog.dismiss(); action() }
+            })
+        }
 
-                    MENU_ITEM_FINISH_AND_SAVE -> {
-                        finishGame()
-                        true
-                    }
+        addButton(getString(R.string.action_save)) { saveCurrentState() }
+        addButton(getString(R.string.action_finish_and_save_hof)) { finishGame() }
+        addButton(getString(R.string.action_save_and_finish)) { saveAndFinish() }
+        addButton(getString(R.string.action_finish_without_save)) { finishWithoutSaving() }
 
-                    MENU_ITEM_SAVE_AND_FINISH -> {
-                        saveAndFinish()
-                        true
-                    }
-
-                    MENU_ITEM_FINISH_WITHOUT_SAVE -> {
-                        finishWithoutSaving()
-                        true
-                    }
-
-                    else -> false
-                }
-            }
-        }.show()
+        dialog.show()
     }
 
     private fun showColorPicker() {
