@@ -2,15 +2,10 @@ package de.badaboomi.gamesheetmanager.ui.halloffame
 
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import de.badaboomi.gamesheetmanager.R
 import de.badaboomi.gamesheetmanager.databinding.ActivityHallOfFameViewBinding
 import de.badaboomi.gamesheetmanager.repository.HallOfFameRepository
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 /**
  * Read-only activity for viewing a completed game sheet from the Hall of Fame.
@@ -28,8 +23,7 @@ class HallOfFameViewActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityHallOfFameViewBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        binding.btnBack.setOnClickListener { finish() }
 
         repository = HallOfFameRepository(this)
 
@@ -48,15 +42,6 @@ class HallOfFameViewActivity : AppCompatActivity() {
             return
         }
 
-        supportActionBar?.title = entry.gameName
-
-        val dateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
-        binding.tvGameInfo.text = getString(
-            R.string.label_game_info,
-            entry.templateName,
-            dateFormat.format(Date(entry.dateCompleted))
-        )
-
         // Load template image as background
         val imageFile = File(entry.templateImagePath)
         if (imageFile.exists()) {
@@ -67,13 +52,5 @@ class HallOfFameViewActivity : AppCompatActivity() {
         // Load the drawing (read-only: touch is disabled)
         binding.drawingView.loadStrokes(entry.drawingData)
         binding.drawingView.isEnabled = false
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            finish()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
     }
 }

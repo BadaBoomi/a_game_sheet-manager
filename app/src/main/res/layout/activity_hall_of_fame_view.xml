@@ -1,46 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="@android:color/black"
+    android:fitsSystemWindows="true">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+    <ImageView
+        android:id="@+id/ivTemplateBackground"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/template_background_desc" />
 
-    <TextView
-        android:id="@+id/tvGameInfo"
+    <de.badaboomi.gamesheetmanager.ui.game.DrawingView
+        android:id="@+id/drawingView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:textSize="13sp"
-        android:textColor="@android:color/secondary_text_light"
-        android:background="?attr/colorSurface" />
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:enabled="false" />
 
-    <!-- Read-only drawing view -->
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
+        android:layout_gravity="top|start"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:padding="10dp"
+        android:src="@drawable/ic_back"
+        android:background="@drawable/bg_floating_menu"
+        android:contentDescription="@string/btn_back"
+        android:elevation="8dp"
+        app:tint="@android:color/black" />
 
-        <ImageView
-            android:id="@+id/ivTemplateBackground"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="fitCenter"
-            android:contentDescription="@string/template_background_desc" />
-
-        <de.badaboomi.gamesheetmanager.ui.game.DrawingView
-            android:id="@+id/drawingView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/transparent"
-            android:enabled="false" />
-
-    </FrameLayout>
-
-</LinearLayout>
+</FrameLayout>
