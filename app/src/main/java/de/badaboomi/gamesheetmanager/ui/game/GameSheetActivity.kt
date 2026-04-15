@@ -94,7 +94,6 @@ class GameSheetActivity : AppCompatActivity() {
             object : GestureDetector.SimpleOnGestureListener() {
                 override fun onDown(e: MotionEvent): Boolean = true
 
-                override fun onDoubleTap(e: MotionEvent): Boolean {
                 override fun onSingleTapUp(e: MotionEvent): Boolean {
                     showFloatingMenu()
                     return true
