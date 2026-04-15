@@ -71,8 +71,7 @@
         <activity
             android:name=".ui.halloffame.HallOfFameViewActivity"
             android:exported="false"
-            android:label="@string/title_hall_of_fame_view"
-            android:screenOrientation="landscape" />
+            android:label="@string/title_hall_of_fame_view" />
 
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
