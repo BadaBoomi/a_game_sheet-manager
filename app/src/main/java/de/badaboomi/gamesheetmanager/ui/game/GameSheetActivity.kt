@@ -108,7 +108,7 @@ class GameSheetActivity : AppCompatActivity() {
             }
         )
 
-        menuButton.setOnTouchListener { view, event ->
+        menuButton.setOnTouchListener { _, event ->
             gestureDetector.onTouchEvent(event)
 
             when (event.actionMasked) {

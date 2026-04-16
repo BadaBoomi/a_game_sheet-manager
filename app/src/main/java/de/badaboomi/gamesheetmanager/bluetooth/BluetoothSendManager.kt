@@ -129,7 +129,7 @@ object BluetoothSendManager {
             if (failure == null) {
                 onSuccess()
             } else {
-                onError(failure!!)
+                onError(failure)
             }
         }.start()
     }
