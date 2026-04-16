@@ -11,8 +11,8 @@ android {
         applicationId = "de.dotzis.spielboegen_manger"
         minSdk = 26
         targetSdk = 35
-        versionCode = 29
-        versionName = "1.9.7"
+        versionCode = 30
+        versionName = "1.9.8"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
