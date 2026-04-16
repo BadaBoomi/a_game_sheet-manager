@@ -30,7 +30,7 @@
             android:layout_width="220dp"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
-            android:src="@drawable/heioodo_logo"
+            android:src="@drawable/ic_launcher_fg"
             android:layout_marginBottom="24dp"
             android:contentDescription="@string/app_name" />
 
