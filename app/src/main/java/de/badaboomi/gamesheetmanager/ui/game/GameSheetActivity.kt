@@ -165,6 +165,7 @@ class GameSheetActivity : AppCompatActivity() {
         }
 
         addButton(getString(R.string.action_save)) { saveCurrentState() }
+        addButton(getString(R.string.action_restart_game)) { restartGameFromTemplate() }
         addButton(getString(R.string.action_finish_and_save_hof)) { finishGame() }
         addButton(getString(R.string.action_save_and_finish)) { saveAndFinish() }
         addButton(getString(R.string.action_finish_without_save)) { finishWithoutSaving() }
@@ -255,6 +256,20 @@ class GameSheetActivity : AppCompatActivity() {
     private fun saveAndFinish() {
         saveCurrentState()
         navigateToStartPage()
+    }
+
+    private fun restartGameFromTemplate() {
+        val sheet = currentSheet ?: return
+        val restartedSheet = GameSheetFactory.createRestartedSheet(sheet)
+        val newSheetId = gameSheetRepository.insertGameSheet(restartedSheet)
+        gameSheetRepository.deleteGameSheet(sheet.id)
+        currentSheet = null
+
+        val intent = Intent(this, GameSheetActivity::class.java).apply {
+            putExtra(EXTRA_SHEET_ID, newSheetId)
+        }
+        startActivity(intent)
+        finish()
     }
 
     private fun navigateToStartPage() {

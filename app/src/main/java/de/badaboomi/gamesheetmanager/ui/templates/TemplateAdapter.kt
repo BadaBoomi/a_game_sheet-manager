@@ -21,10 +21,12 @@ import java.util.Locale
 class TemplateAdapter(
     private val templates: List<Template>,
     private val onItemClick: (Template) -> Unit,
+    private val onStartClick: (Template) -> Unit,
     private val onDeleteClick: (Template) -> Unit,
     private val onEditClick: (Template) -> Unit,
     private val onSendClick: (Template) -> Unit,
-    private val showDeleteButton: Boolean
+    private val showDeleteButton: Boolean,
+    private val showStartButton: Boolean
 ) : BaseAdapter() {
 
     override fun getCount(): Int = templates.size
@@ -54,6 +56,10 @@ class TemplateAdapter(
         val btnDelete = view.findViewById<ImageButton>(R.id.btnDeleteTemplate)
         btnDelete.visibility = if (showDeleteButton) View.VISIBLE else View.GONE
         btnDelete.setOnClickListener { onDeleteClick(template) }
+
+        val btnStart = view.findViewById<ImageButton>(R.id.btnStartTemplate)
+        btnStart.visibility = if (showStartButton) View.VISIBLE else View.GONE
+        btnStart.setOnClickListener { onStartClick(template) }
 
         val btnEdit = view.findViewById<ImageButton>(R.id.btnEditTemplate)
         btnEdit.visibility = if (showDeleteButton) View.VISIBLE else View.GONE

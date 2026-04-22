@@ -26,6 +26,7 @@
     <string name="btn_delete">Löschen</string>
     <string name="btn_save">Speichern</string>
     <string name="btn_edit">Bearbeiten</string>
+    <string name="btn_start_template_direct">Spiel direkt starten</string>
     <string name="btn_send_bluetooth">Per Bluetooth senden</string>
     <string name="dialog_add_template_title">Vorlage hinzufügen</string>
     <string name="dialog_edit_template_title">Vorlage bearbeiten</string>
@@ -98,6 +99,7 @@
     <!-- Game sheet menu -->
     <string name="action_change_pen_style">Stiftgröße und Farbe ändern</string>
     <string name="action_save">Zwischenstand speichern</string>
+    <string name="action_restart_game">Neustart</string>
     <string name="action_finish_game">Beenden</string>
     <string name="action_finish_and_save_hof">Beenden und in Hall of Fame speichern</string>
     <string name="action_save_and_finish">Speichern und beenden</string>

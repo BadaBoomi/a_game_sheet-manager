@@ -217,10 +217,12 @@ class TemplateListActivity : AppCompatActivity() {
         adapter = TemplateAdapter(
             templates = templates,
             onItemClick = { template -> onTemplateClicked(template) },
+            onStartClick = { template -> onTemplateStartClicked(template) },
             onDeleteClick = { template -> confirmDeleteTemplate(template) },
             onEditClick = { template -> showEditTemplateDialog(template) },
             onSendClick = { template -> sendTemplateViaBluetooth(template) },
-            showDeleteButton = mode == MODE_MANAGE
+            showDeleteButton = mode == MODE_MANAGE,
+            showStartButton = TemplateUiRules.showDirectStartButton(mode)
         )
         binding.listTemplates.adapter = adapter
     }
@@ -264,6 +266,13 @@ class TemplateListActivity : AppCompatActivity() {
         )
         val id = gameSheetRepository.insertGameSheet(newSheet)
         openGameSheet(id)
+    }
+
+    private fun onTemplateStartClicked(template: Template) {
+        gameSheetRepository.getActiveSheetForTemplate(template.id)?.let { existingSheet ->
+            gameSheetRepository.deleteGameSheet(existingSheet.id)
+        }
+        startNewGameSheet(template)
     }
 
     private fun openGameSheet(sheetId: Long) {

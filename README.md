@@ -15,6 +15,7 @@ Die **Spielbögen-Manager** App ermöglicht es, Papierbögen von Würfelspielen 
 
 ### Spiel spielen
 - **Vorlage auswählen**: Starte ein neues Spiel auf Basis einer gespeicherten Vorlage
+- **Direktstart aus Vorlagenübersicht**: Starte ein neues Spiel direkt neben einer Vorlage
 - **Zeichnen**: Fülle den Spielbogen per Touchscreen aus
   - Freie Wahl der **Stiftfarbe** (12 vordefinierte Farben)
   - Freie Wahl der **Strichbreite** per Schieberegler
@@ -22,6 +23,7 @@ Die **Spielbögen-Manager** App ermöglicht es, Papierbögen von Würfelspielen 
   - **Alles löschen** der gesamten Zeichnung
 - **Automatisches Speichern**: Der Zwischenstand wird beim Verlassen der App automatisch gespeichert
 - **Explizit speichern**: Manuelle Speicherung des Zwischenstands jederzeit möglich
+- **Neustart im Spielmenü**: Setze den aktuellen Spielbogen auf eine leere neue Runde zurück
 - **Fortsetzen**: Beim nächsten Start einer Vorlage wird gefragt, ob das bestehende Spiel fortgesetzt oder ein neues begonnen werden soll
 
 ### Hall of Fame
