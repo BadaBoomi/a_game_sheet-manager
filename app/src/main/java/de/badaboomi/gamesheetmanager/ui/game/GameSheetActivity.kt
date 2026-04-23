@@ -164,8 +164,8 @@ class GameSheetActivity : AppCompatActivity() {
             })
         }
 
-        addButton(getString(R.string.action_save)) { saveCurrentState() }
         addButton(getString(R.string.action_restart_game)) { restartGameFromTemplate() }
+        addButton(getString(R.string.action_save)) { saveCurrentState() }
         addButton(getString(R.string.action_finish_and_save_hof)) { finishGame() }
         addButton(getString(R.string.action_save_and_finish)) { saveAndFinish() }
         addButton(getString(R.string.action_finish_without_save)) { finishWithoutSaving() }
