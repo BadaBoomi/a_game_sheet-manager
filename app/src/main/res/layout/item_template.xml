@@ -55,7 +55,7 @@
         android:id="@+id/btnStartTemplate"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:src="@drawable/ic_game_sheets"
+        android:src="@drawable/ic_start_game_dice"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/btn_start_template_direct"
         android:tint="@android:color/holo_green_dark" />
