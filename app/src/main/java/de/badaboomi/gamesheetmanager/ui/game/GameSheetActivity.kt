@@ -42,6 +42,7 @@ class GameSheetActivity : AppCompatActivity() {
     private var isDraggingMenuButton = false
     private var dragTouchOffsetX = 0f
     private var dragTouchOffsetY = 0f
+    private var floatingControlsOrientation = LinearLayout.HORIZONTAL
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,6 +82,8 @@ class GameSheetActivity : AppCompatActivity() {
 
     private fun setupFloatingMenuButton() {
         val menuButton = binding.btnMenuHandle
+        floatingControlsOrientation = binding.floatingControls.orientation
+        applyFloatingControlsOrientation(floatingControlsOrientation)
         binding.btnPenStyle.setColorFilter(binding.drawingView.penColor)
         binding.btnPenStyle.setOnClickListener {
             showColorPicker()
@@ -148,7 +151,7 @@ class GameSheetActivity : AppCompatActivity() {
     private fun showFloatingMenu() {
         val dp = resources.displayMetrics.density
         val layout = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
+            orientation = floatingControlsOrientation
             setPadding((16 * dp).toInt(), (8 * dp).toInt(), (16 * dp).toInt(), (8 * dp).toInt())
         }
         val dialog = AlertDialog.Builder(this).setView(layout).create()
@@ -157,13 +160,24 @@ class GameSheetActivity : AppCompatActivity() {
             layout.addView(MaterialButton(this).apply {
                 text = label
                 layoutParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    if (floatingControlsOrientation == LinearLayout.VERTICAL) {
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    } else {
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    },
                     ViewGroup.LayoutParams.WRAP_CONTENT
-                ).apply { setMargins(0, (4 * dp).toInt(), 0, (4 * dp).toInt()) }
+                ).apply {
+                    if (floatingControlsOrientation == LinearLayout.VERTICAL) {
+                        setMargins(0, (4 * dp).toInt(), 0, (4 * dp).toInt())
+                    } else {
+                        setMargins((4 * dp).toInt(), 0, (4 * dp).toInt(), 0)
+                    }
+                }
                 setOnClickListener { dialog.dismiss(); action() }
             })
         }
 
+        addButton(getString(R.string.action_toggle_control_orientation)) { toggleFloatingControlsOrientation() }
         addButton(getString(R.string.action_restart_game)) { restartGameFromTemplate() }
         addButton(getString(R.string.action_save)) { saveCurrentState() }
         addButton(getString(R.string.action_finish_and_save_hof)) { finishGame() }
@@ -171,6 +185,35 @@ class GameSheetActivity : AppCompatActivity() {
         addButton(getString(R.string.action_finish_without_save)) { finishWithoutSaving() }
 
         dialog.show()
+    }
+
+    private fun toggleFloatingControlsOrientation() {
+        val newOrientation = if (floatingControlsOrientation == LinearLayout.HORIZONTAL) {
+            LinearLayout.VERTICAL
+        } else {
+            LinearLayout.HORIZONTAL
+        }
+        applyFloatingControlsOrientation(newOrientation)
+    }
+
+    private fun applyFloatingControlsOrientation(orientation: Int) {
+        floatingControlsOrientation = orientation
+        val controls = binding.floatingControls
+        controls.orientation = orientation
+
+        val spacing = (8 * resources.displayMetrics.density).toInt()
+        for (index in 0 until controls.childCount) {
+            val child = controls.getChildAt(index)
+            val params = child.layoutParams as? LinearLayout.LayoutParams ?: continue
+            if (index == 0) {
+                params.setMargins(0, 0, 0, 0)
+            } else if (orientation == LinearLayout.HORIZONTAL) {
+                params.setMargins(spacing, 0, 0, 0)
+            } else {
+                params.setMargins(0, spacing, 0, 0)
+            }
+            child.layoutParams = params
+        }
     }
 
     private fun showColorPicker() {

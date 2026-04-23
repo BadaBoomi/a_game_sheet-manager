@@ -99,6 +99,7 @@
     <!-- Game sheet menu -->
     <string name="action_change_pen_style">Stiftgröße und Farbe ändern</string>
     <string name="action_save">Zwischenstand speichern</string>
+    <string name="action_toggle_control_orientation">Ausrichtung der Steuerung wechseln</string>
     <string name="action_restart_game">Neustart</string>
     <string name="action_finish_game">Beenden</string>
     <string name="action_finish_and_save_hof">Beenden und in Hall of Fame speichern</string>
