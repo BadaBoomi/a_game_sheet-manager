@@ -82,8 +82,7 @@ class GameSheetActivity : AppCompatActivity() {
 
     private fun setupFloatingMenuButton() {
         val menuButton = binding.btnMenuHandle
-        floatingControlsOrientation = binding.floatingControls.orientation
-        applyFloatingControlsOrientation(floatingControlsOrientation)
+        applyFloatingControlsOrientation(binding.floatingControls.orientation)
         binding.btnPenStyle.setColorFilter(binding.drawingView.penColor)
         binding.btnPenStyle.setOnClickListener {
             showColorPicker()
@@ -205,13 +204,10 @@ class GameSheetActivity : AppCompatActivity() {
         for (index in 0 until controls.childCount) {
             val child = controls.getChildAt(index)
             val params = child.layoutParams as? LinearLayout.LayoutParams ?: continue
-            if (index == 0) {
-                params.setMargins(0, 0, 0, 0)
-            } else if (orientation == LinearLayout.HORIZONTAL) {
-                params.setMargins(spacing, 0, 0, 0)
-            } else {
-                params.setMargins(0, spacing, 0, 0)
-            }
+            val leadingSpacing = if (index == 0) 0 else spacing
+            val startMargin = if (orientation == LinearLayout.HORIZONTAL) leadingSpacing else 0
+            val topMargin = if (orientation == LinearLayout.VERTICAL) leadingSpacing else 0
+            params.setMargins(startMargin, topMargin, 0, 0)
             child.layoutParams = params
         }
     }
