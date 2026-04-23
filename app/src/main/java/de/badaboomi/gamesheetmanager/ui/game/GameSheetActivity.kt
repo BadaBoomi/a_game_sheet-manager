@@ -32,6 +32,7 @@ class GameSheetActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_SHEET_ID = "sheet_id"
+        private const val STATE_FLOATING_CONTROLS_ORIENTATION = "state_floating_controls_orientation"
     }
 
     private lateinit var binding: ActivityGameSheetBinding
@@ -48,6 +49,10 @@ class GameSheetActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityGameSheetBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        floatingControlsOrientation = savedInstanceState?.getInt(
+            STATE_FLOATING_CONTROLS_ORIENTATION,
+            binding.floatingControls.orientation
+        ) ?: binding.floatingControls.orientation
 
         gameSheetRepository = GameSheetRepository(this)
         hallOfFameRepository = HallOfFameRepository(this)
@@ -82,7 +87,7 @@ class GameSheetActivity : AppCompatActivity() {
 
     private fun setupFloatingMenuButton() {
         val menuButton = binding.btnMenuHandle
-        applyFloatingControlsOrientation(binding.floatingControls.orientation)
+        applyFloatingControlsOrientation(floatingControlsOrientation)
         binding.btnPenStyle.setColorFilter(binding.drawingView.penColor)
         binding.btnPenStyle.setOnClickListener {
             showColorPicker()
@@ -330,5 +335,10 @@ class GameSheetActivity : AppCompatActivity() {
             gameSheetRepository.updateGameSheet(updatedSheet)
             currentSheet = updatedSheet
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(STATE_FLOATING_CONTROLS_ORIENTATION, floatingControlsOrientation)
     }
 }
