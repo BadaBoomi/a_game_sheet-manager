@@ -10,4 +10,6 @@
     <color name="colorPrimary">#FF1565C0</color>
     <color name="colorPrimaryDark">#FF0D47A1</color>
     <color name="colorAccent">#FFFF6F00</color>
+    <color name="zoom_pan_tint">#2196F3</color>
+    <color name="zoom_draw_tint">#FF9800</color>
 </resources>
