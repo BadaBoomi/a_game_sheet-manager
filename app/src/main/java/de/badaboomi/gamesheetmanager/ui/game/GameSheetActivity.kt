@@ -1,5 +1,6 @@
 package de.badaboomi.gamesheetmanager.ui.game
 
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.content.Intent
 import android.os.Bundle
@@ -34,6 +35,9 @@ class GameSheetActivity : AppCompatActivity() {
         const val EXTRA_SHEET_ID = "sheet_id"
     }
 
+    /** The three-state zoom cycle: NORMAL → ZOOM_PAN → DRAW_ZOOMED → NORMAL */
+    private enum class ZoomState { NORMAL, ZOOM_PAN, DRAW_ZOOMED }
+
     private lateinit var binding: ActivityGameSheetBinding
     private lateinit var gameSheetRepository: GameSheetRepository
     private lateinit var hallOfFameRepository: HallOfFameRepository
@@ -42,6 +46,9 @@ class GameSheetActivity : AppCompatActivity() {
     private var isDraggingMenuButton = false
     private var dragTouchOffsetX = 0f
     private var dragTouchOffsetY = 0f
+
+    private var zoomState = ZoomState.NORMAL
+    private var templateBitmapCache: Bitmap? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +66,7 @@ class GameSheetActivity : AppCompatActivity() {
 
         loadGameSheet()
         setupFloatingMenuButton()
+        setupZoomButton()
     }
 
     private fun loadGameSheet() {
@@ -73,11 +81,99 @@ class GameSheetActivity : AppCompatActivity() {
         if (imageFile.exists()) {
             val bitmap = BitmapFactory.decodeFile(sheet.templateImagePath)
             binding.ivTemplateBackground.setImageBitmap(bitmap)
+            templateBitmapCache = bitmap
         }
 
         // Load existing drawing strokes
         binding.drawingView.loadStrokes(sheet.drawingData)
     }
+
+    // ── Zoom ─────────────────────────────────────────────────────────────────
+
+    private fun setupZoomButton() {
+        binding.btnZoom.setOnClickListener {
+            when (zoomState) {
+                ZoomState.NORMAL -> enterZoomPanMode()
+                ZoomState.ZOOM_PAN -> enterDrawZoomedMode()
+                ZoomState.DRAW_ZOOMED -> exitZoomMode()
+            }
+        }
+    }
+
+    /**
+     * First tap on zoom: enter zoom/pan mode.
+     * The user can zoom and pan but cannot draw.
+     */
+    private fun enterZoomPanMode() {
+        zoomState = ZoomState.ZOOM_PAN
+        binding.drawingView.zoomModeEnabled = true
+        binding.drawingView.templateBitmap = templateBitmapCache
+        binding.ivTemplateBackground.visibility = View.INVISIBLE
+        updateControlStates()
+    }
+
+    /**
+     * Second tap on zoom: keep the current zoom level and resume drawing.
+     * Pen size is automatically scaled to the zoom factor.
+     */
+    private fun enterDrawZoomedMode() {
+        zoomState = ZoomState.DRAW_ZOOMED
+        binding.drawingView.zoomModeEnabled = false
+        // templateBitmap stays set; ivTemplateBackground stays hidden so the
+        // zoomed template and strokes remain aligned.
+        updateControlStates()
+    }
+
+    /**
+     * Third tap on zoom: return to normal (no-zoom) mode.
+     */
+    private fun exitZoomMode() {
+        zoomState = ZoomState.NORMAL
+        binding.drawingView.zoomModeEnabled = false
+        binding.drawingView.resetZoom()
+        binding.drawingView.templateBitmap = null
+        binding.ivTemplateBackground.visibility = View.VISIBLE
+        updateControlStates()
+    }
+
+    /**
+     * Enables/disables and visually indicates the controls for each zoom state.
+     */
+    private fun updateControlStates() {
+        when (zoomState) {
+            ZoomState.NORMAL -> {
+                binding.btnPenStyle.isEnabled = true
+                binding.btnPenStyle.alpha = 1f
+                binding.btnQuickUndo.isEnabled = true
+                binding.btnQuickUndo.alpha = 1f
+                // Restore the zoom button to its default appearance.
+                binding.btnZoom.clearColorFilter()
+            }
+            ZoomState.ZOOM_PAN -> {
+                // Only menu drag/drop remains usable; pen and undo are disabled.
+                binding.btnPenStyle.isEnabled = false
+                binding.btnPenStyle.alpha = 0.35f
+                binding.btnQuickUndo.isEnabled = false
+                binding.btnQuickUndo.alpha = 0.35f
+                // Highlight zoom button in blue to signal active zoom/pan mode.
+                binding.btnZoom.setColorFilter(
+                    resources.getColor(R.color.zoom_pan_tint, theme)
+                )
+            }
+            ZoomState.DRAW_ZOOMED -> {
+                binding.btnPenStyle.isEnabled = true
+                binding.btnPenStyle.alpha = 1f
+                binding.btnQuickUndo.isEnabled = true
+                binding.btnQuickUndo.alpha = 1f
+                // Highlight zoom button in orange to signal draw-while-zoomed mode.
+                binding.btnZoom.setColorFilter(
+                    resources.getColor(R.color.zoom_draw_tint, theme)
+                )
+            }
+        }
+    }
+
+    // ── Floating menu / drag ─────────────────────────────────────────────────
 
     private fun setupFloatingMenuButton() {
         val menuButton = binding.btnMenuHandle
@@ -184,6 +280,8 @@ class GameSheetActivity : AppCompatActivity() {
             binding.btnPenStyle.setColorFilter(color)
         }.show()
     }
+
+    // ── Game actions ─────────────────────────────────────────────────────────
 
     /**
      * Saves the current state of the drawing.
@@ -293,3 +391,4 @@ class GameSheetActivity : AppCompatActivity() {
         }
     }
 }
+
