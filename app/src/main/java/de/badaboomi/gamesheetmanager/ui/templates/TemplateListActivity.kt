@@ -269,10 +269,22 @@ class TemplateListActivity : AppCompatActivity() {
     }
 
     private fun onTemplateStartClicked(template: Template) {
-        gameSheetRepository.getActiveSheetForTemplate(template.id)?.let { existingSheet ->
-            gameSheetRepository.deleteGameSheet(existingSheet.id)
+        val existingSheet = gameSheetRepository.getActiveSheetForTemplate(template.id)
+        if (existingSheet != null) {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.dialog_existing_sheet_title)
+                .setMessage(R.string.dialog_existing_sheet_message)
+                .setPositiveButton(R.string.btn_continue_sheet) { _, _ ->
+                    openGameSheet(existingSheet.id)
+                }
+                .setNegativeButton(R.string.btn_new_sheet) { _, _ ->
+                    gameSheetRepository.deleteGameSheet(existingSheet.id)
+                    startNewGameSheet(template)
+                }
+                .show()
+        } else {
+            startNewGameSheet(template)
         }
-        startNewGameSheet(template)
     }
 
     private fun openGameSheet(sheetId: Long) {
