@@ -84,6 +84,7 @@
     <string name="btn_new_sheet">Neues Spiel</string>
 
     <!-- Drawing toolbar -->
+    <string name="action_zoom_mode">Zoom-Modus</string>
     <string name="btn_pick_color">Farbe wählen</string>
     <string name="btn_toggle_toolbar">Controls ein-/ausblenden</string>
     <string name="btn_show_controls">Controls anzeigen</string>

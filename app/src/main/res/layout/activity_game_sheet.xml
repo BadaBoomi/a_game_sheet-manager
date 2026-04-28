@@ -21,20 +21,22 @@
         android:layout_height="match_parent"
         android:background="@android:color/transparent" />
 
-    <LinearLayout
+    <GridLayout
         android:id="@+id/floatingControls"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="top|end"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
-        android:orientation="horizontal"
+        android:columnCount="2"
+        android:rowCount="2"
         android:visibility="visible">
 
         <ImageButton
             android:id="@+id/btnPenStyle"
             android:layout_width="52dp"
             android:layout_height="52dp"
+            android:layout_margin="4dp"
             android:padding="10dp"
             android:src="@drawable/ic_color_circle"
             android:background="@drawable/bg_floating_menu"
@@ -42,14 +44,14 @@
             android:elevation="8dp" />
 
         <ImageButton
-            android:id="@+id/btnMenuHandle"
+            android:id="@+id/btnZoom"
             android:layout_width="52dp"
             android:layout_height="52dp"
-            android:layout_marginStart="8dp"
+            android:layout_margin="4dp"
             android:padding="10dp"
-            android:src="@drawable/ic_menu"
+            android:src="@drawable/ic_zoom"
             android:background="@drawable/bg_floating_menu"
-            android:contentDescription="@string/btn_floating_menu"
+            android:contentDescription="@string/action_zoom_mode"
             android:elevation="8dp"
             app:tint="@android:color/black" />
 
@@ -57,7 +59,7 @@
             android:id="@+id/btnQuickUndo"
             android:layout_width="52dp"
             android:layout_height="52dp"
-            android:layout_marginStart="8dp"
+            android:layout_margin="4dp"
             android:padding="10dp"
             android:src="@drawable/ic_undo"
             android:background="@drawable/bg_floating_menu"
@@ -65,6 +67,18 @@
             android:elevation="8dp"
             app:tint="@android:color/black" />
 
-    </LinearLayout>
+        <ImageButton
+            android:id="@+id/btnMenuHandle"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_margin="4dp"
+            android:padding="10dp"
+            android:src="@drawable/ic_menu"
+            android:background="@drawable/bg_floating_menu"
+            android:contentDescription="@string/btn_floating_menu"
+            android:elevation="8dp"
+            app:tint="@android:color/black" />
+
+    </GridLayout>
 
 </FrameLayout>
