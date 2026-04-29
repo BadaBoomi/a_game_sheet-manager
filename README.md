@@ -21,6 +21,7 @@ Die **Spielbögen-Manager** App ermöglicht es, Papierbögen von Würfelspielen 
   - Freie Wahl der **Strichbreite** per Schieberegler
   - **Rückgängig** (Undo) einzelner Striche
   - **Alles löschen** der gesamten Zeichnung
+  - **Zoom-Modus**: Beim Hineinzoomen wird die Strichbreite automatisch mit dem Zoomfaktor multipliziert (z. B. Zoom 2,5× → Strichbreite 2,5×). Beim Verlassen des Zoom-Modus wird die ursprüngliche Strichbreite wiederhergestellt.
 - **Automatisches Speichern**: Der Zwischenstand wird beim Verlassen der App automatisch gespeichert
 - **Explizit speichern**: Manuelle Speicherung des Zwischenstands jederzeit möglich
 - **Neustart im Spielmenü**: Setze den aktuellen Spielbogen auf eine leere neue Runde zurück
