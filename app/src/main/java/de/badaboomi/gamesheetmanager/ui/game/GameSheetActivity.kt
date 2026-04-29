@@ -30,6 +30,8 @@ import java.io.File
  * Supports pen color/width selection, intermediate save, and saving to Hall of Fame.
  */
 class GameSheetActivity : AppCompatActivity() {
+    // Store the original pen width for zoom mode logic
+    private var originalPenWidth: Float? = null
 
     companion object {
         const val EXTRA_SHEET_ID = "sheet_id"
@@ -119,6 +121,12 @@ class GameSheetActivity : AppCompatActivity() {
     private fun enterDrawZoomedMode() {
         zoomState = ZoomState.DRAW_ZOOMED
         binding.drawingView.zoomModeEnabled = false
+        // Store the original pen width if not already stored
+        if (originalPenWidth == null) {
+            originalPenWidth = binding.drawingView.penWidth
+        }
+        // Scale pen width by current zoom factor
+        binding.drawingView.penWidth = (originalPenWidth ?: binding.drawingView.penWidth) * binding.drawingView.currentZoomFactor
         // templateBitmap stays set; ivTemplateBackground stays hidden so the
         // zoomed template and strokes remain aligned.
         updateControlStates()
@@ -133,6 +141,11 @@ class GameSheetActivity : AppCompatActivity() {
         binding.drawingView.resetZoom()
         binding.drawingView.templateBitmap = null
         binding.ivTemplateBackground.visibility = View.VISIBLE
+        // Restore original pen width if it was changed
+        originalPenWidth?.let {
+            binding.drawingView.penWidth = it
+            originalPenWidth = null
+        }
         updateControlStates()
     }
 
