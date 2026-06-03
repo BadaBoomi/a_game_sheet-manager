@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black"
+    android:fitsSystemWindows="true">
+
+    <ImageView
+        android:id="@+id/ivTemplateBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
+        android:contentDescription="@string/template_background_desc" />
+
+    <de.badaboomi.gamesheetmanager.ui.game.DrawingView
+        android:id="@+id/drawingView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent" />
+
+    <GridLayout
+        android:id="@+id/floatingControls"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:columnCount="4"
+        android:rowCount="1"
+        android:visibility="visible">
+
+        <ImageButton
+            android:id="@+id/btnPenStyle"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_margin="4dp"
+            android:padding="10dp"
+            android:src="@drawable/ic_color_circle"
+            android:background="@drawable/bg_floating_menu"
+            android:contentDescription="@string/action_change_pen_style"
+            android:elevation="8dp" />
+
+        <ImageButton
+            android:id="@+id/btnZoom"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_margin="4dp"
+            android:padding="10dp"
+            android:src="@drawable/ic_zoom"
+            android:background="@drawable/bg_floating_menu"
+            android:contentDescription="@string/action_zoom_mode"
+            android:elevation="8dp"
+            app:tint="@android:color/black" />
+
+        <ImageButton
+            android:id="@+id/btnQuickUndo"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_margin="4dp"
+            android:padding="10dp"
+            android:src="@drawable/ic_undo"
+            android:background="@drawable/bg_floating_menu"
+            android:contentDescription="@string/btn_undo"
+            android:elevation="8dp"
+            app:tint="@android:color/black" />
+
+        <ImageButton
+            android:id="@+id/btnMenuHandle"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:layout_margin="4dp"
+            android:padding="10dp"
+            android:src="@drawable/ic_menu"
+            android:background="@drawable/bg_floating_menu"
+            android:contentDescription="@string/btn_floating_menu"
+            android:elevation="8dp"
+            app:tint="@android:color/black" />
+
+    </GridLayout>
+
+</FrameLayout>

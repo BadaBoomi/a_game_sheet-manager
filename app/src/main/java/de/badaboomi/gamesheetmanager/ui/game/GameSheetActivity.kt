@@ -3,13 +3,18 @@ package de.badaboomi.gamesheetmanager.ui.game
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
+import android.view.OrientationEventListener
 import android.view.View
 import android.widget.Toast
 import android.view.ViewGroup
+import android.widget.GridLayout
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -51,6 +56,9 @@ class GameSheetActivity : AppCompatActivity() {
 
     private var zoomState = ZoomState.NORMAL
     private var templateBitmapCache: Bitmap? = null
+    private var menuOrientationListener: OrientationEventListener? = null
+    private var isLandscapeMenuLayout = false
+    private var lastMenuLayoutSwitchAtMs: Long = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,8 +75,20 @@ class GameSheetActivity : AppCompatActivity() {
         }
 
         loadGameSheet()
+        setupMenuOrientationTracking()
         setupFloatingMenuButton()
         setupZoomButton()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        isLandscapeMenuLayout = newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE
+        applyFloatingControlsOrientation(isLandscapeMenuLayout)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        menuOrientationListener?.enable()
     }
 
     private fun loadGameSheet() {
@@ -189,6 +209,7 @@ class GameSheetActivity : AppCompatActivity() {
     // ── Floating menu / drag ─────────────────────────────────────────────────
 
     private fun setupFloatingMenuButton() {
+        val controls = binding.floatingControls
         val menuButton = binding.btnMenuHandle
         binding.btnPenStyle.setColorFilter(binding.drawingView.penColor)
         binding.btnPenStyle.setOnClickListener {
@@ -197,34 +218,34 @@ class GameSheetActivity : AppCompatActivity() {
         binding.btnQuickUndo.setOnClickListener {
             binding.drawingView.undoLastStroke()
         }
+        menuButton.setOnClickListener {
+            showFloatingMenu()
+        }
 
         val gestureDetector = GestureDetectorCompat(
             this,
             object : GestureDetector.SimpleOnGestureListener() {
                 override fun onDown(e: MotionEvent): Boolean = true
 
-                override fun onSingleTapUp(e: MotionEvent): Boolean {
-                    showFloatingMenu()
-                    return true
-                }
-
                 override fun onLongPress(e: MotionEvent) {
                     isDraggingMenuButton = true
-                    dragTouchOffsetX = e.x
-                    dragTouchOffsetY = e.y
-                    menuButton.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                    val controlsLocation = IntArray(2)
+                    controls.getLocationOnScreen(controlsLocation)
+                    dragTouchOffsetX = e.rawX - controlsLocation[0]
+                    dragTouchOffsetY = e.rawY - controlsLocation[1]
+                    controls.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                 }
             }
         )
 
-        menuButton.setOnTouchListener { _, event ->
+        val dragTouchListener = View.OnTouchListener { _, event ->
             gestureDetector.onTouchEvent(event)
 
             when (event.actionMasked) {
                 MotionEvent.ACTION_MOVE -> {
                     if (isDraggingMenuButton) {
                         repositionFloatingControls(event)
-                        return@setOnTouchListener true
+                        return@OnTouchListener true
                     }
                 }
 
@@ -232,13 +253,53 @@ class GameSheetActivity : AppCompatActivity() {
                 MotionEvent.ACTION_CANCEL -> {
                     if (isDraggingMenuButton) {
                         isDraggingMenuButton = false
-                        return@setOnTouchListener true
+                        return@OnTouchListener true
                     }
                 }
             }
 
-            true
+            // Allow normal clicks when we are not actively dragging.
+            isDraggingMenuButton
         }
+
+        // Drag can start from any icon and from free area inside the 2x2 control block.
+        controls.setOnTouchListener(dragTouchListener)
+        binding.btnPenStyle.setOnTouchListener(dragTouchListener)
+        binding.btnZoom.setOnTouchListener(dragTouchListener)
+        binding.btnQuickUndo.setOnTouchListener(dragTouchListener)
+        binding.btnMenuHandle.setOnTouchListener(dragTouchListener)
+    }
+
+    private fun setupMenuOrientationTracking() {
+        isLandscapeMenuLayout = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        applyFloatingControlsOrientation(isLandscapeMenuLayout)
+
+        menuOrientationListener = object : OrientationEventListener(this) {
+            override fun onOrientationChanged(orientation: Int) {
+                if (orientation == ORIENTATION_UNKNOWN) return
+
+                // Landscape when device is rotated ~90° or ~270°.
+                val shouldUseLandscapeLayout =
+                    orientation in 60..120 || orientation in 240..300
+
+                val now = System.currentTimeMillis()
+                if (shouldUseLandscapeLayout != isLandscapeMenuLayout && now - lastMenuLayoutSwitchAtMs >= 250L) {
+                    isLandscapeMenuLayout = shouldUseLandscapeLayout
+                    applyFloatingControlsOrientation(isLandscapeMenuLayout)
+                    lastMenuLayoutSwitchAtMs = now
+                }
+            }
+        }
+    }
+
+    private fun applyFloatingControlsOrientation(isLandscape: Boolean) {
+        // Keep the 2x2 square and current position untouched.
+        // Only rotate icon orientation in landscape.
+        val iconRotation = if (isLandscape) 90f else 0f
+        binding.btnPenStyle.rotation = iconRotation
+        binding.btnZoom.rotation = iconRotation
+        binding.btnQuickUndo.rotation = iconRotation
+        binding.btnMenuHandle.rotation = iconRotation
     }
 
     private fun repositionFloatingControls(event: MotionEvent) {
@@ -256,6 +317,9 @@ class GameSheetActivity : AppCompatActivity() {
 
     private fun showFloatingMenu() {
         val dp = resources.displayMetrics.density
+        // Use the sensor-driven game orientation state so the dialog follows
+        // the same orientation behavior as the floating controls.
+        val isLandscape = isLandscapeMenuLayout
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding((16 * dp).toInt(), (8 * dp).toInt(), (16 * dp).toInt(), (8 * dp).toInt())
@@ -263,23 +327,42 @@ class GameSheetActivity : AppCompatActivity() {
         val dialog = AlertDialog.Builder(this).setView(layout).create()
 
         fun addButton(label: String, action: () -> Unit) {
-            layout.addView(MaterialButton(this).apply {
+            val button = MaterialButton(this).apply {
                 text = label
-                layoutParams = LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                ).apply { setMargins(0, (4 * dp).toInt(), 0, (4 * dp).toInt()) }
                 setOnClickListener { dialog.dismiss(); action() }
-            })
+                if (isLandscape) {
+                    minWidth = (220 * dp).toInt()
+                    minHeight = (56 * dp).toInt()
+                    setPadding((20 * dp).toInt(), (12 * dp).toInt(), (20 * dp).toInt(), (12 * dp).toInt())
+                    strokeWidth = (2.5f * dp).toInt().coerceAtLeast(2)
+                    strokeColor = ColorStateList.valueOf(Color.WHITE)
+                    insetTop = 0
+                    insetBottom = 0
+                }
+            }
+
+            button.layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply { setMargins(0, (4 * dp).toInt(), 0, (4 * dp).toInt()) }
+
+            layout.addView(button)
         }
 
         addButton(getString(R.string.action_restart_game)) { restartGameFromTemplate() }
-        addButton(getString(R.string.action_save)) { saveCurrentState() }
         addButton(getString(R.string.action_finish_and_save_hof)) { finishGame() }
-        addButton(getString(R.string.action_save_and_finish)) { saveAndFinish() }
-        addButton(getString(R.string.action_finish_without_save)) { finishWithoutSaving() }
+        addButton(getString(R.string.action_finish_without_save)) { saveAndFinish() }
 
         dialog.show()
+
+        if (isLandscape) {
+            // Rotate the whole menu so entries remain stacked vertically.
+            layout.rotation = 90f
+            dialog.window?.setLayout(
+                (resources.displayMetrics.widthPixels * 0.82f).toInt(),
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
     }
 
     private fun showColorPicker() {
@@ -320,7 +403,7 @@ class GameSheetActivity : AppCompatActivity() {
             setText(sheet.templateName)
             setPadding(48, 24, 48, 24)
         }
-        AlertDialog.Builder(this)
+        val dialog = AlertDialog.Builder(this)
             .setTitle(R.string.dialog_finish_game_title)
             .setMessage(R.string.dialog_finish_game_message)
             .setView(nameInput)
@@ -346,7 +429,9 @@ class GameSheetActivity : AppCompatActivity() {
                 navigateToStartPage()
             }
             .setNegativeButton(android.R.string.cancel, null)
-            .show()
+            .create()
+
+        dialog.show()
     }
 
     private fun finishWithoutSaving() {
@@ -393,6 +478,7 @@ class GameSheetActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+        menuOrientationListener?.disable()
         // Auto-save on pause
         currentSheet?.let {
             val updatedSheet = it.copy(
