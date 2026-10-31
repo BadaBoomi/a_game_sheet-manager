@@ -7,10 +7,12 @@ import android.graphics.Color
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
+import androidx.core.view.ViewCompat
 import de.badaboomi.gamesheetmanager.utils.DrawPoint
 import de.badaboomi.gamesheetmanager.utils.DrawStroke
 import de.badaboomi.gamesheetmanager.utils.DrawingSerializer
@@ -119,9 +121,25 @@ class DrawingView @JvmOverloads constructor(
         translateY = translateY.coerceIn(-(scaleFactor - 1f) * height, 0f)
     }
 
+    companion object {
+        internal fun createSystemGestureExclusionRect(width: Int, height: Int): Rect? {
+            if (width <= 0 || height <= 0) return null
+            return Rect(0, 0, width, height)
+        }
+    }
+
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         constrainTranslation()
+        updateSystemGestureExclusion()
+    }
+
+    private fun updateSystemGestureExclusion() {
+        val rect = createSystemGestureExclusionRect(width, height) ?: return
+
+        // Keep the entire drawing surface out of the system edge-gesture area so
+        // drawing near the screen border cannot accidentally trigger back/recents.
+        ViewCompat.setSystemGestureExclusionRects(this, listOf(rect))
     }
 
     // ── Stroke management ───────────────────────────────────────────────────
