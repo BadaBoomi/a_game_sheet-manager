@@ -25,6 +25,7 @@ class TemplateAdapter(
     private val onDeleteClick: (Template) -> Unit,
     private val onEditClick: (Template) -> Unit,
     private val onSendClick: (Template) -> Unit,
+    private val onExportClick: (Template) -> Unit,
     private val showDeleteButton: Boolean,
     private val showStartButton: Boolean
 ) : BaseAdapter() {
@@ -68,6 +69,10 @@ class TemplateAdapter(
         val btnSend = view.findViewById<ImageButton>(R.id.btnSendTemplate)
         btnSend.visibility = if (showDeleteButton) View.VISIBLE else View.GONE
         btnSend.setOnClickListener { onSendClick(template) }
+
+        val btnExport = view.findViewById<ImageButton>(R.id.btnExportTemplate)
+        btnExport.visibility = if (showDeleteButton) View.VISIBLE else View.GONE
+        btnExport.setOnClickListener { onExportClick(template) }
 
         view.setOnClickListener { onItemClick(template) }
 

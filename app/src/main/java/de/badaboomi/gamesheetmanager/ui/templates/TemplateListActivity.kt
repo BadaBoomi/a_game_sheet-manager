@@ -30,6 +30,7 @@ import de.badaboomi.gamesheetmanager.repository.GameSheetRepository
 import de.badaboomi.gamesheetmanager.repository.TemplateRepository
 import de.badaboomi.gamesheetmanager.ui.game.GameSheetActivity
 import de.badaboomi.gamesheetmanager.utils.FileUtils
+import de.badaboomi.gamesheetmanager.utils.TemplateExportUtils
 import com.yalantis.ucrop.UCrop
 import java.io.File
 
@@ -221,6 +222,7 @@ class TemplateListActivity : AppCompatActivity() {
             onDeleteClick = { template -> confirmDeleteTemplate(template) },
             onEditClick = { template -> showEditTemplateDialog(template) },
             onSendClick = { template -> sendTemplateViaBluetooth(template) },
+            onExportClick = { template -> exportTemplate(template) },
             showDeleteButton = mode == MODE_MANAGE,
             showStartButton = TemplateUiRules.showDirectStartButton(mode)
         )
@@ -386,6 +388,57 @@ class TemplateListActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    private fun exportTemplate(template: Template) {
+        val exportDir = File(cacheDir, "exports").apply { mkdirs() }
+        val outputFile = File(exportDir, "template_${template.id}_${System.currentTimeMillis()}.zip")
+        val exported = TemplateExportUtils.createArchive(outputFile, listOf(template))
+        if (exported == null) {
+            Toast.makeText(this, R.string.msg_template_export_error, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        shareExportedArchive(exported, template.name)
+    }
+
+    private fun exportSelectedTemplates() {
+        if (templates.isEmpty()) {
+            Toast.makeText(this, R.string.msg_template_export_selection_error, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val exportDir = File(cacheDir, "exports").apply { mkdirs() }
+        val file = File(exportDir, "templates_export_${System.currentTimeMillis()}.zip")
+        val exported = TemplateExportUtils.createArchive(file, templates)
+        if (exported == null) {
+            Toast.makeText(this, R.string.msg_template_export_error, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        shareExportedArchive(exported, getString(R.string.title_templates))
+    }
+
+    private fun shareExportedArchive(exportedFile: File, displayName: String) {
+        val uri = FileProvider.getUriForFile(
+            this,
+            "${packageName}.fileprovider",
+            exportedFile
+        )
+
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "application/zip"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            putExtra(Intent.EXTRA_SUBJECT, displayName)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+
+        try {
+            startActivity(Intent.createChooser(intent, getString(R.string.dialog_export_title)))
+            Toast.makeText(this, getString(R.string.msg_template_exported, displayName), Toast.LENGTH_SHORT).show()
+        } catch (_: ActivityNotFoundException) {
+            Toast.makeText(this, R.string.msg_template_export_error, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     // -------------------------------------------------------------------------
     // Camera / gallery / crop helpers
     // -------------------------------------------------------------------------
@@ -499,10 +552,21 @@ class TemplateListActivity : AppCompatActivity() {
             .show()
     }
 
+    override fun onCreateOptionsMenu(menu: android.view.Menu): Boolean {
+        if (mode == MODE_MANAGE) {
+            menuInflater.inflate(R.menu.menu_templates, menu)
+        }
+        return super.onCreateOptionsMenu(menu)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
                 finish()
+                true
+            }
+            R.id.action_export_templates -> {
+                exportSelectedTemplates()
                 true
             }
             else -> super.onOptionsItemSelected(item)
