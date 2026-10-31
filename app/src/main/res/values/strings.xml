@@ -105,6 +105,8 @@
     <string name="action_finish_and_save_hof">In Hall of Fame Speichern</string>
     <string name="action_save_and_finish">Speichern und beenden</string>
     <string name="action_finish_without_save">Beenden</string>
+    <string name="action_move_menu">Menü verschieben</string>
+    <string name="action_rotate_menu">Menü drehen</string>
     <string name="msg_sheet_saved">Zwischenstand gespeichert</string>
 
     <!-- Hall of Fame -->
