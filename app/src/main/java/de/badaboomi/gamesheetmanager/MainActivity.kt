@@ -38,6 +38,10 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, HallOfFameActivity::class.java))
         }
 
+        binding.btnExit.setOnClickListener {
+            finish()
+        }
+
         binding.btnUsageGuide.setOnClickListener {
             showUsageGuide()
         }
