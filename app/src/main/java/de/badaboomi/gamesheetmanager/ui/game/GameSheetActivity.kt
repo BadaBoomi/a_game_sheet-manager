@@ -37,9 +37,18 @@ import java.io.File
 class GameSheetActivity : AppCompatActivity() {
     // Store the original pen width for zoom mode logic
     private var originalPenWidth: Float? = null
+    private var hamburgerMenuRotation = 0f
 
     companion object {
         const val EXTRA_SHEET_ID = "sheet_id"
+
+        internal fun getInitialHamburgerMenuRotation(isLandscape: Boolean): Float =
+            if (isLandscape) 90f else 0f
+
+        internal fun rotateHamburgerMenu(currentRotation: Float): Float {
+            val normalized = ((currentRotation % 360f) + 360f) % 360f
+            return if (normalized >= 270f) 0f else normalized + 90f
+        }
     }
 
     /** The three-state zoom cycle: NORMAL → ZOOM_PAN → DRAW_ZOOMED → NORMAL */
@@ -295,11 +304,12 @@ class GameSheetActivity : AppCompatActivity() {
     private fun applyFloatingControlsOrientation(isLandscape: Boolean) {
         // Keep the 2x2 square and current position untouched.
         // Only rotate icon orientation in landscape.
-        val iconRotation = if (isLandscape) 90f else 0f
+        val iconRotation = getInitialHamburgerMenuRotation(isLandscape)
         binding.btnPenStyle.rotation = iconRotation
         binding.btnZoom.rotation = iconRotation
         binding.btnQuickUndo.rotation = iconRotation
         binding.btnMenuHandle.rotation = iconRotation
+        hamburgerMenuRotation = iconRotation
     }
 
     private fun repositionFloatingControls(event: MotionEvent) {
@@ -317,8 +327,6 @@ class GameSheetActivity : AppCompatActivity() {
 
     private fun showFloatingMenu() {
         val dp = resources.displayMetrics.density
-        // Use the sensor-driven game orientation state so the dialog follows
-        // the same orientation behavior as the floating controls.
         val isLandscape = isLandscapeMenuLayout
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -353,11 +361,34 @@ class GameSheetActivity : AppCompatActivity() {
         addButton(getString(R.string.action_finish_and_save_hof)) { finishGame() }
         addButton(getString(R.string.action_finish_without_save)) { saveAndFinish() }
 
+        val rotateButton = MaterialButton(this).apply {
+            text = "↻"
+            contentDescription = "Rotate menu"
+            setOnClickListener {
+                hamburgerMenuRotation = rotateHamburgerMenu(hamburgerMenuRotation)
+                layout.rotation = hamburgerMenuRotation
+            }
+            if (isLandscape) {
+                minWidth = (220 * dp).toInt()
+                minHeight = (56 * dp).toInt()
+                setPadding((20 * dp).toInt(), (12 * dp).toInt(), (20 * dp).toInt(), (12 * dp).toInt())
+                strokeWidth = (2.5f * dp).toInt().coerceAtLeast(2)
+                strokeColor = ColorStateList.valueOf(Color.WHITE)
+                insetTop = 0
+                insetBottom = 0
+            }
+        }
+        rotateButton.layoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ).apply { setMargins(0, (4 * dp).toInt(), 0, (4 * dp).toInt()) }
+        layout.addView(rotateButton)
+
         dialog.show()
 
         if (isLandscape) {
             // Rotate the whole menu so entries remain stacked vertically.
-            layout.rotation = 90f
+            layout.rotation = hamburgerMenuRotation
             dialog.window?.setLayout(
                 (resources.displayMetrics.widthPixels * 0.82f).toInt(),
                 ViewGroup.LayoutParams.WRAP_CONTENT
