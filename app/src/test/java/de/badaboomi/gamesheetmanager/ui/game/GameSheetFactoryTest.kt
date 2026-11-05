@@ -27,4 +27,15 @@ class GameSheetFactoryTest {
         assertEquals("[]", restarted.drawingData)
         assertNotEquals(current.id, restarted.id)
     }
+
+    @Test
+    fun `hamburger menu rotation starts in game orientation and advances by 90 degrees`() {
+        assertEquals(90f, GameSheetActivity.getInitialHamburgerMenuRotation(true), 0.01f)
+        assertEquals(0f, GameSheetActivity.getInitialHamburgerMenuRotation(false), 0.01f)
+
+        assertEquals(90f, GameSheetActivity.rotateHamburgerMenu(0f), 0.01f)
+        assertEquals(180f, GameSheetActivity.rotateHamburgerMenu(90f), 0.01f)
+        assertEquals(270f, GameSheetActivity.rotateHamburgerMenu(180f), 0.01f)
+        assertEquals(0f, GameSheetActivity.rotateHamburgerMenu(270f), 0.01f)
+    }
 }
