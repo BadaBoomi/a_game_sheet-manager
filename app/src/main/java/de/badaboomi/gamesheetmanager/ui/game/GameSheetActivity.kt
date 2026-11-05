@@ -10,10 +10,11 @@ import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.OrientationEventListener
 import android.view.View
-import android.widget.Toast
 import android.view.ViewGroup
 import android.widget.GridLayout
+import android.widget.ImageButton
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GestureDetectorCompat
@@ -328,6 +329,36 @@ class GameSheetActivity : AppCompatActivity() {
             setPadding((16 * dp).toInt(), (8 * dp).toInt(), (16 * dp).toInt(), (8 * dp).toInt())
         }
         val dialog = AlertDialog.Builder(this).setView(layout).create()
+        val actionsLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+        }
+        val rotateButton = ImageButton(this).apply {
+            setImageResource(R.drawable.ic_rotate_right)
+            setBackgroundResource(R.drawable.bg_floating_menu)
+            contentDescription = getString(R.string.action_rotate_menu)
+            setPadding((8 * dp).toInt(), (8 * dp).toInt(), (8 * dp).toInt(), (8 * dp).toInt())
+            imageTintList = android.content.res.ColorStateList.valueOf(
+                resources.getColor(android.R.color.black, theme)
+            )
+            elevation = 8f * dp
+            setOnClickListener {
+                actionsLayout.rotation = rotateHamburgerMenu(actionsLayout.rotation)
+            }
+        }
+
+        rotateButton.layoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ).apply {
+            gravity = android.view.Gravity.END
+        }
+        layout.addView(rotateButton)
+
+        actionsLayout.layoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        layout.addView(actionsLayout)
 
         fun addButton(label: String, action: () -> Unit) {
             val button = MaterialButton(this).apply {
@@ -340,7 +371,7 @@ class GameSheetActivity : AppCompatActivity() {
                 ViewGroup.LayoutParams.WRAP_CONTENT
             ).apply { setMargins(0, (4 * dp).toInt(), 0, (4 * dp).toInt()) }
 
-            layout.addView(button)
+            actionsLayout.addView(button)
         }
 
         addButton(getString(R.string.action_restart_game)) { restartGameFromTemplate() }
