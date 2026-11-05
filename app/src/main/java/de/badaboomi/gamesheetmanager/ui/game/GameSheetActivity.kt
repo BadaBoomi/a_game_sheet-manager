@@ -3,9 +3,7 @@ package de.badaboomi.gamesheetmanager.ui.game
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.content.res.Configuration
-import android.graphics.Color
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.HapticFeedbackConstants
@@ -37,7 +35,6 @@ import java.io.File
 class GameSheetActivity : AppCompatActivity() {
     // Store the original pen width for zoom mode logic
     private var originalPenWidth: Float? = null
-    private var hamburgerMenuRotation = 0f
 
     companion object {
         const val EXTRA_SHEET_ID = "sheet_id"
@@ -309,7 +306,6 @@ class GameSheetActivity : AppCompatActivity() {
         binding.btnZoom.rotation = iconRotation
         binding.btnQuickUndo.rotation = iconRotation
         binding.btnMenuHandle.rotation = iconRotation
-        hamburgerMenuRotation = iconRotation
     }
 
     private fun repositionFloatingControls(event: MotionEvent) {
@@ -327,7 +323,6 @@ class GameSheetActivity : AppCompatActivity() {
 
     private fun showFloatingMenu() {
         val dp = resources.displayMetrics.density
-        val isLandscape = isLandscapeMenuLayout
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding((16 * dp).toInt(), (8 * dp).toInt(), (16 * dp).toInt(), (8 * dp).toInt())
@@ -338,15 +333,6 @@ class GameSheetActivity : AppCompatActivity() {
             val button = MaterialButton(this).apply {
                 text = label
                 setOnClickListener { dialog.dismiss(); action() }
-                if (isLandscape) {
-                    minWidth = (220 * dp).toInt()
-                    minHeight = (56 * dp).toInt()
-                    setPadding((20 * dp).toInt(), (12 * dp).toInt(), (20 * dp).toInt(), (12 * dp).toInt())
-                    strokeWidth = (2.5f * dp).toInt().coerceAtLeast(2)
-                    strokeColor = ColorStateList.valueOf(Color.WHITE)
-                    insetTop = 0
-                    insetBottom = 0
-                }
             }
 
             button.layoutParams = LinearLayout.LayoutParams(
@@ -361,38 +347,13 @@ class GameSheetActivity : AppCompatActivity() {
         addButton(getString(R.string.action_finish_and_save_hof)) { finishGame() }
         addButton(getString(R.string.action_finish_without_save)) { saveAndFinish() }
 
-        val rotateButton = MaterialButton(this).apply {
-            text = "↻"
-            contentDescription = "Rotate menu"
-            setOnClickListener {
-                hamburgerMenuRotation = rotateHamburgerMenu(hamburgerMenuRotation)
-                layout.rotation = hamburgerMenuRotation
-            }
-            if (isLandscape) {
-                minWidth = (220 * dp).toInt()
-                minHeight = (56 * dp).toInt()
-                setPadding((20 * dp).toInt(), (12 * dp).toInt(), (20 * dp).toInt(), (12 * dp).toInt())
-                strokeWidth = (2.5f * dp).toInt().coerceAtLeast(2)
-                strokeColor = ColorStateList.valueOf(Color.WHITE)
-                insetTop = 0
-                insetBottom = 0
-            }
-        }
-        rotateButton.layoutParams = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        ).apply { setMargins(0, (4 * dp).toInt(), 0, (4 * dp).toInt()) }
-        layout.addView(rotateButton)
-
         dialog.show()
-
-        if (isLandscape) {
-            // Rotate the whole menu so entries remain stacked vertically.
-            layout.rotation = hamburgerMenuRotation
-            dialog.window?.setLayout(
-                (resources.displayMetrics.widthPixels * 0.82f).toInt(),
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+        val horizontalMarginPx = (24 * dp).toInt()
+        val maxDialogWidthPx = (360 * dp).toInt()
+        val widthByScreenPx = resources.displayMetrics.widthPixels - (horizontalMarginPx * 2)
+        val dialogWidthPx = minOf(maxDialogWidthPx, widthByScreenPx)
+        if (dialogWidthPx > 0) {
+            dialog.window?.setLayout(dialogWidthPx, ViewGroup.LayoutParams.WRAP_CONTENT)
         }
     }
 
@@ -521,4 +482,3 @@ class GameSheetActivity : AppCompatActivity() {
         }
     }
 }
-
