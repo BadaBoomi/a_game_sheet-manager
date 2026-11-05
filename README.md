@@ -23,18 +23,20 @@ Die **Spielbögen-Manager** App ermöglicht es, Papierbögen von Würfelspielen 
   - **Alles löschen** der gesamten Zeichnung
   - **Zoom-Modus**: Beim Hineinzoomen wird die Strichbreite automatisch mit dem Zoomfaktor multipliziert (z. B. Zoom 2,5× → Strichbreite 2,5×). Beim Verlassen des Zoom-Modus wird die ursprüngliche Strichbreite wiederhergestellt.
 - **Automatisches Speichern**: Der Zwischenstand wird beim Verlassen der App automatisch gespeichert
-- **Spielmenü (3 Optionen + Rotieren-Icon)**:
+- **Spielmenü (4 Optionen + Rotieren-Icon)**:
   - **Neustart**: Setzt den aktuellen Spielbogen auf eine leere neue Runde zurück
   - **In Hall of Fame speichern**: Öffnet den Namensdialog und speichert den Spielbogen dauerhaft in der Hall of Fame
+  - **Einstellungen**: Öffnet die Auswahl für Stiftfarbe und Strichbreite
   - **Beenden**: Speichert den aktuellen Stand und beendet das Spiel direkt
   - **Rotieren-Icon**: Oben rechts im Menü; dreht das geöffnete Menü in 90°-Schritten im Uhrzeigersinn, ohne es zu schließen
+- **Drehen**: Ein eigenes Floating-Icon dreht den Spielbogen in 90°-Schritten im Uhrzeigersinn
 - **Menü verschieben (Drag & Drop)**: Das schwebende 2×2-Menü kann per Long-Press von jedem der vier Icons aus verschoben werden (auch innerhalb der Menüfläche)
 - **Fortsetzen**: Beim nächsten Start einer Vorlage wird gefragt, ob das bestehende Spiel fortgesetzt oder ein neues begonnen werden soll
 
 #### Bedienung im Querformat
-- Das Spielblatt selbst bleibt in fester Ausrichtung, um unbeabsichtigtes Drehen zu vermeiden.
+- Das Spielblatt kann bei Bedarf manuell über das Drehen-Icon in 90°-Schritten gedreht werden.
 - Die vier schwebenden Steuer-Icons bleiben als 2×2-Block an ihrer Position und passen ihre Ausrichtung an.
-- Das Spielmenü bleibt bei drei Optionen: **Neustart**, **In Hall of Fame speichern**, **Beenden**; zusätzlich steht oben rechts ein Rotieren-Icon zur Verfügung.
+- Das Spielmenü bietet **Neustart**, **In Hall of Fame speichern**, **Einstellungen** und **Beenden**; zusätzlich steht oben rechts ein Rotieren-Icon zur Verfügung.
 - Drag & Drop des Menü-Blocks funktioniert per Long-Press von jedem Icon aus.
 - Der Namensdialog für Hall of Fame wird in einer zur Tastatur passenden Ausrichtung angezeigt.
 

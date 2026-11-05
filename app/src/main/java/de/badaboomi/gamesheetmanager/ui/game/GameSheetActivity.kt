@@ -63,6 +63,7 @@ class GameSheetActivity : AppCompatActivity() {
 
     private var zoomState = ZoomState.NORMAL
     private var templateBitmapCache: Bitmap? = null
+    private var gameSheetRotationDegrees = 0f
     private var menuOrientationListener: OrientationEventListener? = null
     private var isLandscapeMenuLayout = false
     private var lastMenuLayoutSwitchAtMs: Long = 0L
@@ -182,17 +183,13 @@ class GameSheetActivity : AppCompatActivity() {
     private fun updateControlStates() {
         when (zoomState) {
             ZoomState.NORMAL -> {
-                binding.btnPenStyle.isEnabled = true
-                binding.btnPenStyle.alpha = 1f
                 binding.btnQuickUndo.isEnabled = true
                 binding.btnQuickUndo.alpha = 1f
                 // Restore the zoom button to its default appearance.
                 binding.btnZoom.clearColorFilter()
             }
             ZoomState.ZOOM_PAN -> {
-                // Only menu drag/drop remains usable; pen and undo are disabled.
-                binding.btnPenStyle.isEnabled = false
-                binding.btnPenStyle.alpha = 0.35f
+                // Only menu drag/drop remains usable; undo is disabled.
                 binding.btnQuickUndo.isEnabled = false
                 binding.btnQuickUndo.alpha = 0.35f
                 // Highlight zoom button in blue to signal active zoom/pan mode.
@@ -201,8 +198,6 @@ class GameSheetActivity : AppCompatActivity() {
                 )
             }
             ZoomState.DRAW_ZOOMED -> {
-                binding.btnPenStyle.isEnabled = true
-                binding.btnPenStyle.alpha = 1f
                 binding.btnQuickUndo.isEnabled = true
                 binding.btnQuickUndo.alpha = 1f
                 // Highlight zoom button in orange to signal draw-while-zoomed mode.
@@ -218,12 +213,11 @@ class GameSheetActivity : AppCompatActivity() {
     private fun setupFloatingMenuButton() {
         val controls = binding.floatingControls
         val menuButton = binding.btnMenuHandle
-        binding.btnPenStyle.setColorFilter(binding.drawingView.penColor)
-        binding.btnPenStyle.setOnClickListener {
-            showColorPicker()
-        }
         binding.btnQuickUndo.setOnClickListener {
             binding.drawingView.undoLastStroke()
+        }
+        binding.btnRotate.setOnClickListener {
+            rotateGameSheetClockwise()
         }
         menuButton.setOnClickListener {
             showFloatingMenu()
@@ -271,9 +265,9 @@ class GameSheetActivity : AppCompatActivity() {
 
         // Drag can start from any icon and from free area inside the 2x2 control block.
         controls.setOnTouchListener(dragTouchListener)
-        binding.btnPenStyle.setOnTouchListener(dragTouchListener)
         binding.btnZoom.setOnTouchListener(dragTouchListener)
         binding.btnQuickUndo.setOnTouchListener(dragTouchListener)
+        binding.btnRotate.setOnTouchListener(dragTouchListener)
         binding.btnMenuHandle.setOnTouchListener(dragTouchListener)
     }
 
@@ -303,10 +297,16 @@ class GameSheetActivity : AppCompatActivity() {
         // Keep the 2x2 square and current position untouched.
         // Only rotate icon orientation in landscape.
         val iconRotation = getInitialHamburgerMenuRotation(isLandscape)
-        binding.btnPenStyle.rotation = iconRotation
         binding.btnZoom.rotation = iconRotation
         binding.btnQuickUndo.rotation = iconRotation
+        binding.btnRotate.rotation = iconRotation
         binding.btnMenuHandle.rotation = iconRotation
+    }
+
+    private fun rotateGameSheetClockwise() {
+        gameSheetRotationDegrees = rotateHamburgerMenu(gameSheetRotationDegrees)
+        binding.ivTemplateBackground.rotation = gameSheetRotationDegrees
+        binding.drawingView.rotation = gameSheetRotationDegrees
     }
 
     private fun repositionFloatingControls(event: MotionEvent) {
@@ -360,9 +360,11 @@ class GameSheetActivity : AppCompatActivity() {
         )
         layout.addView(actionsLayout)
 
-        fun addButton(label: String, action: () -> Unit) {
+        fun addButton(label: String, enabled: Boolean = true, action: () -> Unit) {
             val button = MaterialButton(this).apply {
                 text = label
+                isEnabled = enabled
+                alpha = if (enabled) 1f else 0.35f
                 setOnClickListener { dialog.dismiss(); action() }
             }
 
@@ -376,6 +378,10 @@ class GameSheetActivity : AppCompatActivity() {
 
         addButton(getString(R.string.action_restart_game)) { restartGameFromTemplate() }
         addButton(getString(R.string.action_finish_and_save_hof)) { finishGame() }
+        addButton(
+            label = getString(R.string.action_settings),
+            enabled = zoomState != ZoomState.ZOOM_PAN
+        ) { showColorPicker() }
         addButton(getString(R.string.action_finish_without_save)) { saveAndFinish() }
 
         dialog.show()
@@ -396,7 +402,6 @@ class GameSheetActivity : AppCompatActivity() {
         ) { color, width ->
             binding.drawingView.penColor = color
             binding.drawingView.penWidth = width
-            binding.btnPenStyle.setColorFilter(color)
         }.show()
     }
 
