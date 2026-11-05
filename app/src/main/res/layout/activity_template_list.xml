@@ -27,7 +27,7 @@
             android:id="@+id/listTemplates"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:divider="@android:color/darker_gray"
+            android:divider="?android:attr/textColorTertiary"
             android:dividerHeight="0.5dp" />
 
         <TextView
@@ -36,7 +36,7 @@
             android:layout_height="match_parent"
             android:text="@string/empty_templates"
             android:textSize="16sp"
-            android:textColor="@android:color/darker_gray"
+            android:textColor="?android:attr/textColorSecondary"
             android:gravity="center"
             android:visibility="gone"
             android:padding="32dp" />

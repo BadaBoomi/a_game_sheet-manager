@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="@android:color/primary_text_light" />
+            android:textColor="?android:attr/textColorPrimary" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -43,7 +43,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
-                android:textColor="?attr/colorPrimary" />
+                android:textColor="?android:attr/textColorSecondary" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -52,14 +52,14 @@
                 android:layout_marginEnd="6dp"
                 android:text="@string/label_separator_dot"
                 android:textSize="12sp"
-                android:textColor="@android:color/secondary_text_light" />
+                android:textColor="?android:attr/textColorSecondary" />
 
             <TextView
                 android:id="@+id/tvCompletedDate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
-                android:textColor="@android:color/secondary_text_light" />
+                android:textColor="?android:attr/textColorSecondary" />
         </LinearLayout>
 
     </LinearLayout>
