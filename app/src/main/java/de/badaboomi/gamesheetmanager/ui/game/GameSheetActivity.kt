@@ -64,6 +64,7 @@ class GameSheetActivity : AppCompatActivity() {
     private var templateBitmapCache: Bitmap? = null
     private var menuOrientationListener: OrientationEventListener? = null
     private var isLandscapeMenuLayout = false
+    private var manualMenuRotation = 0f
     private var lastMenuLayoutSwitchAtMs: Long = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -301,11 +302,16 @@ class GameSheetActivity : AppCompatActivity() {
     private fun applyFloatingControlsOrientation(isLandscape: Boolean) {
         // Keep the 2x2 square and current position untouched.
         // Only rotate icon orientation in landscape.
-        val iconRotation = getInitialHamburgerMenuRotation(isLandscape)
+        val iconRotation = getInitialHamburgerMenuRotation(isLandscape) + manualMenuRotation
         binding.btnPenStyle.rotation = iconRotation
         binding.btnZoom.rotation = iconRotation
         binding.btnQuickUndo.rotation = iconRotation
         binding.btnMenuHandle.rotation = iconRotation
+    }
+
+    private fun rotateFloatingMenu() {
+        manualMenuRotation = rotateHamburgerMenu(manualMenuRotation)
+        applyFloatingControlsOrientation(isLandscapeMenuLayout)
     }
 
     private fun repositionFloatingControls(event: MotionEvent) {
@@ -344,6 +350,7 @@ class GameSheetActivity : AppCompatActivity() {
         }
 
         addButton(getString(R.string.action_restart_game)) { restartGameFromTemplate() }
+        addButton(getString(R.string.action_rotate_menu)) { rotateFloatingMenu() }
         addButton(getString(R.string.action_finish_and_save_hof)) { finishGame() }
         addButton(getString(R.string.action_finish_without_save)) { saveAndFinish() }
 

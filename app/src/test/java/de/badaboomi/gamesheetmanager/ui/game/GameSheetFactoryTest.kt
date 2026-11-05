@@ -38,4 +38,12 @@ class GameSheetFactoryTest {
         assertEquals(270f, GameSheetActivity.rotateHamburgerMenu(180f), 0.01f)
         assertEquals(0f, GameSheetActivity.rotateHamburgerMenu(270f), 0.01f)
     }
+
+    @Test
+    fun `menu rotation keeps landscape start offset and adds manual 90 degree increments`() {
+        assertEquals(90f, GameSheetActivity.getInitialHamburgerMenuRotation(true) + 0f, 0.01f)
+        assertEquals(180f, GameSheetActivity.getInitialHamburgerMenuRotation(true) + GameSheetActivity.rotateHamburgerMenu(0f), 0.01f)
+        assertEquals(270f, GameSheetActivity.getInitialHamburgerMenuRotation(true) + GameSheetActivity.rotateHamburgerMenu(90f), 0.01f)
+        assertEquals(360f, GameSheetActivity.getInitialHamburgerMenuRotation(true) + GameSheetActivity.rotateHamburgerMenu(180f), 0.01f)
+    }
 }
