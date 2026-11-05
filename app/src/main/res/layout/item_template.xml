@@ -52,6 +52,15 @@
         android:tint="@android:color/holo_blue_dark" />
 
     <ImageButton
+        android:id="@+id/btnExportTemplate"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@android:drawable/ic_menu_share"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/btn_export_template"
+        android:tint="@android:color/holo_purple" />
+
+    <ImageButton
         android:id="@+id/btnStartTemplate"
         android:layout_width="40dp"
         android:layout_height="40dp"

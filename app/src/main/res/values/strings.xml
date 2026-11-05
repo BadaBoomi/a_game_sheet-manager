@@ -29,6 +29,12 @@
     <string name="btn_edit">Bearbeiten</string>
     <string name="btn_start_template_direct">Spiel direkt starten</string>
     <string name="btn_send_bluetooth">Per Bluetooth senden</string>
+    <string name="btn_export_template">Vorlage exportieren</string>
+    <string name="msg_template_exported">Vorlage „%s" exportiert.</string>
+    <string name="msg_template_export_error">Fehler beim Exportieren der Vorlage.</string>
+    <string name="msg_template_export_selection_error">Bitte wähle mindestens eine Vorlage zum Exportieren aus.</string>
+    <string name="dialog_export_title">Vorlagen exportieren</string>
+    <string name="dialog_export_message">Diese Vorlage als Datei exportieren?</string>
     <string name="dialog_add_template_title">Vorlage hinzufügen</string>
     <string name="dialog_edit_template_title">Vorlage bearbeiten</string>
     <string name="option_change_name">Namen ändern</string>
