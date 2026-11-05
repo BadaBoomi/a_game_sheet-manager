@@ -21,7 +21,8 @@ import java.util.Locale
 class HallOfFameAdapter(
     private val entries: List<HallOfFameEntry>,
     private val onItemClick: (HallOfFameEntry) -> Unit,
-    private val onDeleteClick: (HallOfFameEntry) -> Unit
+    private val onDeleteClick: (HallOfFameEntry) -> Unit,
+    private val onEditClick: (HallOfFameEntry) -> Unit
 ) : BaseAdapter() {
 
     override fun getCount(): Int = entries.size
@@ -51,6 +52,9 @@ class HallOfFameAdapter(
 
         view.findViewById<ImageButton>(R.id.btnDeleteEntry).setOnClickListener {
             onDeleteClick(entry)
+        }
+        view.findViewById<ImageButton>(R.id.btnEditEntry).setOnClickListener {
+            onEditClick(entry)
         }
 
         view.setOnClickListener { onItemClick(entry) }

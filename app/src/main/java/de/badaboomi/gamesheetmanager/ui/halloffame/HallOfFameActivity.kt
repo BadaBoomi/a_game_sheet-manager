@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import de.badaboomi.gamesheetmanager.R
@@ -13,7 +14,6 @@ import de.badaboomi.gamesheetmanager.repository.HallOfFameRepository
 
 /**
  * Activity showing all completed game sheets saved in the Hall of Fame.
- * These entries are read-only.
  */
 class HallOfFameActivity : AppCompatActivity() {
 
@@ -43,7 +43,8 @@ class HallOfFameActivity : AppCompatActivity() {
         adapter = HallOfFameAdapter(
             entries = entries,
             onItemClick = { entry -> openEntry(entry) },
-            onDeleteClick = { entry -> confirmDelete(entry) }
+            onDeleteClick = { entry -> confirmDelete(entry) },
+            onEditClick = { entry -> showEditTitleDialog(entry) }
         )
         binding.listHallOfFame.adapter = adapter
     }
@@ -70,6 +71,26 @@ class HallOfFameActivity : AppCompatActivity() {
             .setPositiveButton(R.string.btn_delete) { _, _ ->
                 repository.deleteEntry(entry.id)
                 loadEntries()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun showEditTitleDialog(entry: HallOfFameEntry) {
+        val editText = android.widget.EditText(this).apply {
+            hint = getString(R.string.hint_game_name)
+            setText(entry.gameName)
+            setPadding(48, 24, 48, 24)
+        }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.dialog_edit_hof_title)
+            .setView(editText)
+            .setPositiveButton(R.string.btn_save) { _, _ ->
+                val updatedTitle = editText.text.toString().trim()
+                    .ifEmpty { entry.gameName }
+                repository.updateEntryTitle(entry.id, updatedTitle)
+                loadEntries()
+                Toast.makeText(this, R.string.msg_hof_title_updated, Toast.LENGTH_SHORT).show()
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()

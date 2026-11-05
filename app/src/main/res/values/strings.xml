@@ -36,9 +36,6 @@
     <string name="dialog_export_title">Vorlagen exportieren</string>
     <string name="dialog_export_message">Diese Vorlage als Datei exportieren?</string>
     <string name="dialog_add_template_title">Vorlage hinzufügen</string>
-    <string name="dialog_edit_template_title">Vorlage bearbeiten</string>
-    <string name="option_change_name">Namen ändern</string>
-    <string name="option_change_image">Bild ändern</string>
     <string name="dialog_template_name_title">Name der Vorlage</string>
     <string name="hint_template_name">Name eingeben…</string>
     <string name="default_template_name">Vorlage</string>
@@ -124,6 +121,9 @@
     <string name="msg_saved_to_hof">Spiel in der Hall of Fame gespeichert!</string>
     <string name="empty_hall_of_fame">Die Hall of Fame ist noch leer.\n\nBeende ein Spiel, um es hier zu speichern.</string>
     <string name="label_game_info">Vorlage: %1$s · Abgeschlossen: %2$s</string>
+    <string name="dialog_edit_hof_title">Titel ändern</string>
+    <string name="msg_hof_title_updated">Titel aktualisiert</string>
+    <string name="label_separator_dot">•</string>
     <string name="dialog_delete_hof_title">Eintrag löschen?</string>
     <string name="dialog_delete_hof_message">Möchtest du „%s" aus der Hall of Fame löschen?</string>
 

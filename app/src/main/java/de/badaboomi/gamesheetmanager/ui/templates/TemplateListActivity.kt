@@ -45,7 +45,6 @@ class TemplateListActivity : AppCompatActivity() {
         const val MODE_MANAGE = "manage"
         const val MODE_SELECT = "select"
         private const val SAVED_CAMERA_FILE_PATH = "camera_file_path"
-        private const val SAVED_EDITING_TEMPLATE_ID = "editing_template_id"
     }
 
     private lateinit var binding: ActivityTemplateListBinding
@@ -56,9 +55,6 @@ class TemplateListActivity : AppCompatActivity() {
     private var mode = MODE_MANAGE
     private var cameraImageFile: File? = null
     private var pendingTemplateImageUri: Uri? = null
-
-    /** Non-null when the image-change flow was started for an existing template. */
-    private var editingTemplate: Template? = null
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -108,12 +104,7 @@ class TemplateListActivity : AppCompatActivity() {
         if (result.resultCode == RESULT_OK) {
             val outputUri = result.data?.let { UCrop.getOutput(it) }
             if (outputUri != null) {
-                val editing = editingTemplate
-                if (editing != null) {
-                    updateTemplateImage(editing, outputUri)
-                } else {
-                    handleImageSelected(outputUri)
-                }
+                handleImageSelected(outputUri)
             } else {
                 Toast.makeText(this, R.string.msg_crop_failed, Toast.LENGTH_SHORT).show()
             }
@@ -123,7 +114,6 @@ class TemplateListActivity : AppCompatActivity() {
             Toast.makeText(this, R.string.msg_crop_failed, Toast.LENGTH_SHORT).show()
         }
         pendingTemplateImageUri = null
-        editingTemplate = null
     }
 
     private val btPermissionLauncher = registerForActivityResult(
@@ -178,10 +168,6 @@ class TemplateListActivity : AppCompatActivity() {
                     cameraImageFile = file
                 }
             }
-            val editingId = savedInstanceState.getLong(SAVED_EDITING_TEMPLATE_ID, -1L)
-            if (editingId >= 0) {
-                editingTemplate = templateRepository.getTemplateById(editingId)
-            }
         }
 
         val titleRes = if (mode == MODE_SELECT) R.string.title_select_template else R.string.title_templates
@@ -204,9 +190,6 @@ class TemplateListActivity : AppCompatActivity() {
         cameraImageFile?.let {
             outState.putString(SAVED_CAMERA_FILE_PATH, it.absolutePath)
         }
-        editingTemplate?.let {
-            outState.putLong(SAVED_EDITING_TEMPLATE_ID, it.id)
-        }
     }
 
     override fun onResume() {
@@ -220,7 +203,7 @@ class TemplateListActivity : AppCompatActivity() {
             onItemClick = { template -> onTemplateClicked(template) },
             onStartClick = { template -> onTemplateStartClicked(template) },
             onDeleteClick = { template -> confirmDeleteTemplate(template) },
-            onEditClick = { template -> showEditTemplateDialog(template) },
+            onEditClick = { template -> showEditNameDialog(template) },
             onSendClick = { template -> sendTemplateViaBluetooth(template) },
             onExportClick = { template -> exportTemplate(template) },
             showDeleteButton = mode == MODE_MANAGE,
@@ -314,27 +297,6 @@ class TemplateListActivity : AppCompatActivity() {
             .show()
     }
 
-    // -------------------------------------------------------------------------
-    // Edit template
-    // -------------------------------------------------------------------------
-
-    private fun showEditTemplateDialog(template: Template) {
-        AlertDialog.Builder(this)
-            .setTitle(R.string.dialog_edit_template_title)
-            .setItems(
-                arrayOf(
-                    getString(R.string.option_change_name),
-                    getString(R.string.option_change_image)
-                )
-            ) { _, which ->
-                when (which) {
-                    0 -> showEditNameDialog(template)
-                    1 -> startEditImageFlow(template)
-                }
-            }
-            .show()
-    }
-
     private fun showEditNameDialog(template: Template) {
         val editText = android.widget.EditText(this).apply {
             hint = getString(R.string.hint_template_name)
@@ -354,25 +316,6 @@ class TemplateListActivity : AppCompatActivity() {
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
-    }
-
-    private fun startEditImageFlow(template: Template) {
-        editingTemplate = template
-        showAddTemplateDialog()
-    }
-
-    private fun updateTemplateImage(template: Template, newImageUri: Uri) {
-        val oldImagePath = template.imagePath
-        val newImagePath = FileUtils.copyImageToTemplatesDir(this, newImageUri)
-        if (newImagePath != null) {
-            val updated = template.copy(imagePath = newImagePath)
-            templateRepository.updateTemplate(updated)
-            FileUtils.deleteFile(oldImagePath)
-            loadTemplates()
-            Toast.makeText(this, R.string.msg_template_updated, Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this, R.string.msg_template_save_error, Toast.LENGTH_SHORT).show()
-        }
     }
 
     // -------------------------------------------------------------------------
@@ -498,16 +441,10 @@ class TemplateListActivity : AppCompatActivity() {
 
     /**
      * Handles the case where the crop flow fails or is unavailable.
-     * Routes to either the template-update path or the new-template path.
+     * Continues with the uncropped source image for creating a new template.
      */
     private fun fallbackFromCrop(sourceUri: Uri) {
-        val editing = editingTemplate
-        if (editing != null) {
-            editingTemplate = null
-            updateTemplateImage(editing, sourceUri)
-        } else {
-            handleImageSelected(sourceUri)
-        }
+        handleImageSelected(sourceUri)
     }
 
     private fun handleImageSelected(uri: Uri) {

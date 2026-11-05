@@ -11,7 +11,7 @@ Die **Spielbögen-Manager** App ermöglicht es, Papierbögen von Würfelspielen 
 ### Vorlagen verwalten
 - **Einscannen**: Fotografiere Papiervorlagen direkt mit der Kamera
 - **Importieren**: Lade Bilder aus der Galerie als Vorlage
-- **Verwalten**: Übersicht aller gespeicherten Vorlagen mit Löschfunktion
+- **Verwalten**: Übersicht aller gespeicherten Vorlagen mit Umbenennen und Löschfunktion
 
 ### Spiel spielen
 - **Vorlage auswählen**: Starte ein neues Spiel auf Basis einer gespeicherten Vorlage
@@ -39,7 +39,7 @@ Die **Spielbögen-Manager** App ermöglicht es, Papierbögen von Würfelspielen 
 
 ### Hall of Fame
 - **Spiel beenden**: Speichere abgeschlossene Spielbögen dauerhaft in der Hall of Fame
-- **Nicht veränderbar**: Gespeicherte Einträge sind schreibgeschützt
+- **Titel anpassen**: Gespeicherte Einträge können nachträglich umbenannt werden
 - **Übersicht**: Alle vergangenen Spiele sind einsehbar
 
 ## Technische Details

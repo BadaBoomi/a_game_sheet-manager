@@ -7,7 +7,6 @@ import de.badaboomi.gamesheetmanager.data.HallOfFameEntry
 
 /**
  * Repository for managing Hall of Fame entries in the database.
- * Hall of Fame entries are read-only once saved.
  */
 class HallOfFameRepository(context: Context) {
 
@@ -56,6 +55,18 @@ class HallOfFameRepository(context: Context) {
     fun deleteEntry(id: Long): Int {
         return db.writableDatabase.delete(
             AppDatabase.TABLE_HALL_OF_FAME,
+            "${AppDatabase.COL_HOF_ID} = ?",
+            arrayOf(id.toString())
+        )
+    }
+
+    fun updateEntryTitle(id: Long, gameName: String): Int {
+        val values = ContentValues().apply {
+            put(AppDatabase.COL_HOF_GAME_NAME, gameName)
+        }
+        return db.writableDatabase.update(
+            AppDatabase.TABLE_HALL_OF_FAME,
+            values,
             "${AppDatabase.COL_HOF_ID} = ?",
             arrayOf(id.toString())
         )
