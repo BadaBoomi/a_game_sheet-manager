@@ -83,4 +83,14 @@ class TemplateRepository(context: Context) {
             arrayOf(id.toString())
         )
     }
+
+    fun deleteTemplatesByName(names: Collection<String>) {
+        if (names.isEmpty()) return
+        val placeholders = names.joinToString(",") { "?" }
+        db.writableDatabase.delete(
+            AppDatabase.TABLE_TEMPLATES,
+            "${AppDatabase.COL_TEMPLATE_NAME} IN ($placeholders)",
+            names.toTypedArray()
+        )
+    }
 }

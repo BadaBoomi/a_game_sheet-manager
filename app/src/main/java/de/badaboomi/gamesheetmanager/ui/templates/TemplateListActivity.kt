@@ -9,12 +9,14 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import java.io.FileOutputStream
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -55,6 +57,8 @@ class TemplateListActivity : AppCompatActivity() {
     private var mode = MODE_MANAGE
     private var cameraImageFile: File? = null
     private var pendingTemplateImageUri: Uri? = null
+    private val selectedTemplateIds = mutableSetOf<Long>()
+    private var selectionMode = false
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -206,8 +210,11 @@ class TemplateListActivity : AppCompatActivity() {
             onEditClick = { template -> showEditNameDialog(template) },
             onSendClick = { template -> sendTemplateViaBluetooth(template) },
             onExportClick = { template -> exportTemplate(template) },
+            onToggleSelection = { template -> toggleTemplateSelection(template) },
             showDeleteButton = mode == MODE_MANAGE,
-            showStartButton = TemplateUiRules.showDirectStartButton(mode)
+            showStartButton = TemplateUiRules.showDirectStartButton(mode),
+            showSelectionCheckBox = selectionMode,
+            selectedTemplateIds = selectedTemplateIds
         )
         binding.listTemplates.adapter = adapter
     }
@@ -215,10 +222,56 @@ class TemplateListActivity : AppCompatActivity() {
     private fun loadTemplates() {
         templates.clear()
         templates.addAll(templateRepository.getAllTemplates())
+        selectedTemplateIds.retainAll(templates.map { it.id }.toSet())
+        if (selectionMode && selectedTemplateIds.isEmpty()) {
+            selectionMode = false
+        }
         adapter.notifyDataSetChanged()
 
         binding.emptyView.visibility = if (templates.isEmpty()) View.VISIBLE else View.GONE
         binding.listTemplates.visibility = if (templates.isEmpty()) View.GONE else View.VISIBLE
+    }
+
+    private fun toggleTemplateSelection(template: Template) {
+        if (!selectionMode) {
+            selectionMode = true
+            setupList()
+        }
+
+        if (selectedTemplateIds.contains(template.id)) {
+            selectedTemplateIds.remove(template.id)
+        } else {
+            selectedTemplateIds.add(template.id)
+        }
+
+        if (selectedTemplateIds.isEmpty()) {
+            selectionMode = false
+            setupList()
+        } else {
+            adapter.notifyDataSetChanged()
+        }
+        invalidateOptionsMenu()
+    }
+
+    private fun exportSelectedTemplates() {
+        val selectedTemplates = templates.filter { selectedTemplateIds.contains(it.id) }
+        if (selectedTemplates.isEmpty()) {
+            Toast.makeText(this, R.string.msg_template_export_selection_error, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val exportDir = File(cacheDir, "exports").apply { mkdirs() }
+        val file = File(exportDir, "templates_export_${System.currentTimeMillis()}.zip")
+        val exported = TemplateExportUtils.createArchive(file, selectedTemplates)
+        if (exported == null) {
+            Toast.makeText(this, R.string.msg_template_export_error, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        selectedTemplateIds.clear()
+        selectionMode = false
+        adapter.notifyDataSetChanged()
+        shareExportedArchive(exported, getString(R.string.title_templates))
     }
 
     private fun onTemplateClicked(template: Template) {
@@ -285,16 +338,109 @@ class TemplateListActivity : AppCompatActivity() {
                 arrayOf(
                     getString(R.string.option_take_photo),
                     getString(R.string.option_from_gallery),
+                    getString(R.string.option_import_archive),
                     getString(R.string.option_receive_bluetooth)
                 )
             ) { _, which ->
                 when (which) {
                     0 -> takePhoto()
                     1 -> pickFromGallery()
-                    2 -> checkBtPermissionsAndReceive()
+                    2 -> pickArchiveForImport()
+                    3 -> checkBtPermissionsAndReceive()
                 }
             }
             .show()
+    }
+
+    private val archiveImportLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri == null) return@registerForActivityResult
+        importTemplatesFromArchive(uri)
+    }
+
+    private fun pickArchiveForImport() {
+        archiveImportLauncher.launch("application/zip")
+    }
+
+    private fun importTemplatesFromArchive(uri: Uri) {
+        val archiveFile = File(cacheDir, "template_import_${System.currentTimeMillis()}.zip")
+        try {
+            contentResolver.openInputStream(uri)?.use { input ->
+                FileOutputStream(archiveFile).use { output -> input.copyTo(output) }
+            } ?: run {
+                Toast.makeText(this, R.string.msg_template_import_error, Toast.LENGTH_SHORT).show()
+                return
+            }
+        } catch (_: Exception) {
+            Toast.makeText(this, R.string.msg_template_import_error, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val imported = TemplateExportUtils.readArchive(archiveFile) ?: run {
+            Toast.makeText(this, R.string.msg_template_import_error, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val existingNames = templateRepository.getAllTemplates().map { it.name }
+        val duplicateNames = TemplateExportUtils.findDuplicateTemplateNames(existingNames, imported.templates)
+        if (duplicateNames.isNotEmpty()) {
+            val duplicateNameSet = duplicateNames.toSet()
+            val overwriteTemplates = imported.templates.filter { duplicateNameSet.contains(it.name) }
+            val nonOverwriteTemplates = imported.templates.filterNot { duplicateNameSet.contains(it.name) }
+            showOverwriteDialog(overwriteTemplates, nonOverwriteTemplates)
+            return
+        }
+
+        importTemplates(imported.templates, overwriteNames = emptySet())
+    }
+
+    private fun showOverwriteDialog(
+        overwriteTemplates: List<TemplateExportUtils.ImportedTemplate>,
+        nonOverwriteTemplates: List<TemplateExportUtils.ImportedTemplate>
+    ) {
+        val names = overwriteTemplates.joinToString(", ") { it.name }
+        AlertDialog.Builder(this)
+            .setTitle(R.string.dialog_overwrite_templates_title)
+            .setMessage(getString(R.string.dialog_overwrite_templates_message, names))
+            .setPositiveButton(R.string.btn_overwrite) { _, _ ->
+                importTemplates(overwriteTemplates + nonOverwriteTemplates, overwriteNames = overwriteTemplates.map { it.name }.toSet())
+            }
+            .setNegativeButton(android.R.string.cancel) { _, _ ->
+                importTemplates(nonOverwriteTemplates, overwriteNames = emptySet())
+            }
+            .show()
+    }
+
+    private fun importTemplates(
+        importedTemplates: List<TemplateExportUtils.ImportedTemplate>,
+        overwriteNames: Set<String>
+    ) {
+        if (importedTemplates.isEmpty()) {
+            Toast.makeText(this, R.string.msg_template_import_no_new_templates, Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (overwriteNames.isNotEmpty()) {
+            templateRepository.deleteTemplatesByName(overwriteNames)
+        }
+
+        var importedCount = 0
+        importedTemplates.forEach { imported ->
+            val decoded = BitmapFactory.decodeByteArray(imported.imageBytes, 0, imported.imageBytes.size)
+            if (decoded == null) {
+                return@forEach
+            }
+            val imagePath = FileUtils.saveBitmapToFile(this, decoded)
+            if (imagePath != null) {
+                templateRepository.insertTemplate(Template(name = imported.name, imagePath = imagePath))
+                importedCount++
+            }
+            decoded.recycle()
+        }
+
+        loadTemplates()
+        Toast.makeText(this, getString(R.string.msg_templates_imported, importedCount), Toast.LENGTH_SHORT).show()
     }
 
     private fun showEditNameDialog(template: Template) {
@@ -500,6 +646,15 @@ class TemplateListActivity : AppCompatActivity() {
         return when (item.itemId) {
             android.R.id.home -> {
                 finish()
+                true
+            }
+            R.id.action_select_templates -> {
+                selectionMode = !selectionMode
+                if (!selectionMode) {
+                    selectedTemplateIds.clear()
+                }
+                setupList()
+                invalidateOptionsMenu()
                 true
             }
             R.id.action_export_templates -> {

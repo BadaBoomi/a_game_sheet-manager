@@ -1,9 +1,11 @@
 package de.badaboomi.gamesheetmanager.utils
 
 import de.badaboomi.gamesheetmanager.data.Template
+import org.json.JSONObject
 import java.io.File
 import java.io.FileOutputStream
 import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 
 /**
@@ -11,6 +13,23 @@ import java.util.zip.ZipOutputStream
  * The archive contains an export manifest and each template image.
  */
 object TemplateExportUtils {
+
+    data class ImportedTemplate(
+        val name: String,
+        val imageFileName: String,
+        val imageBytes: ByteArray
+    )
+
+    data class ArchiveImportResult(
+        val templates: List<ImportedTemplate>
+    ) {
+        val conflictingNames: List<String>
+            get() = templates
+                .groupBy { it.name }
+                .filterValues { it.size > 1 }
+                .keys
+                .toList()
+    }
 
     fun createArchive(outputFile: File, templates: List<Template>): File? {
         if (templates.isEmpty()) return null
@@ -47,6 +66,32 @@ object TemplateExportUtils {
         return outputFile
     }
 
+    fun readArchive(archiveFile: File): ArchiveImportResult? {
+        if (!archiveFile.exists()) return null
+
+        return try {
+            ZipFile(archiveFile).use { zip ->
+                val manifestEntry = zip.getEntry("manifest.json") ?: return null
+                val manifestText = zip.getInputStream(manifestEntry).bufferedReader(Charsets.UTF_8).use { it.readText() }
+                val imported = parseManifestTemplates(manifestText, zip)
+                if (imported.isEmpty()) null else ArchiveImportResult(imported)
+            }
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    fun findDuplicateTemplateNames(
+        existingNames: Collection<String>,
+        importedTemplates: List<ImportedTemplate>
+    ): List<String> {
+        val normalizedExisting = existingNames.map { it.trim() }.filter { it.isNotEmpty() }.toSet()
+        return importedTemplates
+            .map { it.name.trim() }
+            .filter { it.isNotEmpty() && normalizedExisting.contains(it) }
+            .distinct()
+    }
+
     private data class ExportEntry(
         val template: Template,
         val imageFileName: String,
@@ -81,6 +126,31 @@ object TemplateExportUtils {
         return builder.toString()
     }
 
+    private fun parseManifestTemplates(manifestText: String, zip: ZipFile): List<ImportedTemplate> {
+        return try {
+            val manifest = JSONObject(manifestText)
+            val allTemplates = manifest.optJSONArray("templates") ?: return emptyList()
+            val entries = mutableListOf<ImportedTemplate>()
+
+            for (i in 0 until allTemplates.length()) {
+                val item = allTemplates.getJSONObject(i)
+                val name = item.optString("name").trim()
+                val imageName = item.optString("image").trim()
+                if (name.isBlank() || imageName.isBlank()) continue
+                val entry = zip.getEntry("images/$imageName")
+                    ?: zip.entries().asSequence().firstOrNull { it.name.endsWith("/$imageName") || it.name == imageName }
+                    ?: continue
+                val imageBytes = zip.getInputStream(entry).readBytes()
+                if (imageBytes.isNotEmpty()) {
+                    entries.add(ImportedTemplate(name, imageName, imageBytes))
+                }
+            }
+            entries
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
+
     private fun sanitizeFileName(name: String, templateId: Long): String {
         val sanitized = name.ifBlank { "template" }
             .replace("\\", "_")
@@ -96,6 +166,15 @@ object TemplateExportUtils {
             .replace("\n", "_")
             .trim()
         return if (sanitized.isNotEmpty()) "${sanitized}_$templateId" else "template_$templateId"
+    }
+
+    private fun unescapeJson(value: String): String {
+        return value
+            .replace("\\\\", "\\")
+            .replace("\\\"", "\"")
+            .replace("\\n", "\n")
+            .replace("\\r", "\r")
+            .replace("\\t", "\t")
     }
 
     private fun escapeJson(value: String): String {

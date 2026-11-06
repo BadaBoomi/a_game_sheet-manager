@@ -30,6 +30,7 @@
     <string name="btn_start_template_direct">Spiel direkt starten</string>
     <string name="btn_send_bluetooth">Per Bluetooth senden</string>
     <string name="btn_export_template">Vorlage exportieren</string>
+    <string name="action_select_templates">Vorlagen auswählen</string>
     <string name="msg_template_exported">Vorlage „%s" exportiert.</string>
     <string name="msg_template_export_error">Fehler beim Exportieren der Vorlage.</string>
     <string name="msg_template_export_selection_error">Bitte wähle mindestens eine Vorlage zum Exportieren aus.</string>
@@ -41,7 +42,14 @@
     <string name="default_template_name">Vorlage</string>
     <string name="option_take_photo">Foto aufnehmen</string>
     <string name="option_from_gallery">Aus Galerie auswählen</string>
+    <string name="option_import_archive">Archiv importieren</string>
     <string name="title_crop_template">Vorlage zuschneiden</string>
+    <string name="dialog_overwrite_templates_title">Vorlagen überschreiben?</string>
+    <string name="dialog_overwrite_templates_message">Im Archiv gibt es bereits Vorlagen mit folgenden Namen: %s. Möchtest du diese überschreiben?</string>
+    <string name="btn_overwrite">Überschreiben</string>
+    <string name="msg_template_import_error">Importieren der Vorlage aus dem Archiv fehlgeschlagen.</string>
+    <string name="msg_template_import_no_new_templates">Keine neuen Vorlagen zum Importieren gefunden.</string>
+    <string name="msg_templates_imported">%d Vorlagen importiert.</string>
     <string name="msg_crop_cancelled">Zuschneiden abgebrochen</string>
     <string name="msg_crop_failed">Bild konnte nicht zugeschnitten werden</string>
     <string name="msg_template_saved">Vorlage gespeichert</string>
