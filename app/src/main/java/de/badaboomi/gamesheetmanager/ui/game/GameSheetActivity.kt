@@ -23,9 +23,11 @@ import de.badaboomi.gamesheetmanager.MainActivity
 import de.badaboomi.gamesheetmanager.R
 import de.badaboomi.gamesheetmanager.data.GameSheet
 import de.badaboomi.gamesheetmanager.data.HallOfFameEntry
+import de.badaboomi.gamesheetmanager.data.Template
 import de.badaboomi.gamesheetmanager.databinding.ActivityGameSheetBinding
 import de.badaboomi.gamesheetmanager.repository.GameSheetRepository
 import de.badaboomi.gamesheetmanager.repository.HallOfFameRepository
+import de.badaboomi.gamesheetmanager.repository.TemplateRepository
 import java.io.File
 
 /**
@@ -47,6 +49,17 @@ class GameSheetActivity : AppCompatActivity() {
             val normalized = ((currentRotation % 360f) + 360f) % 360f
             return if (normalized >= 270f) 0f else normalized + 90f
         }
+
+        internal fun normalizeRotationForTemplateStorage(rotation: Float): Float {
+            val normalized = ((rotation % 360f) + 360f) % 360f
+            return when {
+                normalized < 45f -> 0f
+                normalized < 135f -> 90f
+                normalized < 225f -> 180f
+                normalized < 315f -> 270f
+                else -> 0f
+            }
+        }
     }
 
     /** The three-state zoom cycle: NORMAL → ZOOM_PAN → DRAW_ZOOMED → NORMAL */
@@ -55,7 +68,9 @@ class GameSheetActivity : AppCompatActivity() {
     private lateinit var binding: ActivityGameSheetBinding
     private lateinit var gameSheetRepository: GameSheetRepository
     private lateinit var hallOfFameRepository: HallOfFameRepository
+    private lateinit var templateRepository: TemplateRepository
     private var currentSheet: GameSheet? = null
+    private var currentTemplate: Template? = null
     private var sheetId: Long = -1
     private var isDraggingMenuButton = false
     private var dragTouchOffsetX = 0f
@@ -64,6 +79,7 @@ class GameSheetActivity : AppCompatActivity() {
     private var zoomState = ZoomState.NORMAL
     private var templateBitmapCache: Bitmap? = null
     private var gameSheetRotationDegrees = 0f
+    private var popupMenuRotationDegrees = 0f
     private var menuOrientationListener: OrientationEventListener? = null
     private var isLandscapeMenuLayout = false
     private var lastMenuLayoutSwitchAtMs: Long = 0L
@@ -75,6 +91,7 @@ class GameSheetActivity : AppCompatActivity() {
 
         gameSheetRepository = GameSheetRepository(this)
         hallOfFameRepository = HallOfFameRepository(this)
+        templateRepository = TemplateRepository(this)
 
         sheetId = intent.getLongExtra(EXTRA_SHEET_ID, -1)
         if (sheetId == -1L) {
@@ -105,6 +122,7 @@ class GameSheetActivity : AppCompatActivity() {
             return
         }
         currentSheet = sheet
+        currentTemplate = templateRepository.getTemplateById(sheet.templateId)
 
         // Load template image
         val imageFile = File(sheet.templateImagePath)
@@ -116,6 +134,14 @@ class GameSheetActivity : AppCompatActivity() {
 
         // Load existing drawing strokes
         binding.drawingView.loadStrokes(sheet.drawingData)
+
+        gameSheetRotationDegrees = normalizeRotationForTemplateStorage(
+            currentTemplate?.sheetRotationDegrees ?: 0f
+        )
+        popupMenuRotationDegrees = normalizeRotationForTemplateStorage(
+            currentTemplate?.menuRotationDegrees ?: 0f
+        )
+        applyGameSheetRotation()
     }
 
     // ── Zoom ─────────────────────────────────────────────────────────────────
@@ -305,8 +331,32 @@ class GameSheetActivity : AppCompatActivity() {
 
     private fun rotateGameSheetClockwise() {
         gameSheetRotationDegrees = rotateHamburgerMenu(gameSheetRotationDegrees)
+        applyGameSheetRotation()
+        persistTemplateRotations()
+    }
+
+    private fun applyGameSheetRotation() {
         binding.ivTemplateBackground.rotation = gameSheetRotationDegrees
         binding.drawingView.rotation = gameSheetRotationDegrees
+    }
+
+    private fun persistTemplateRotations() {
+        val template = currentTemplate ?: return
+        val normalizedSheetRotation = normalizeRotationForTemplateStorage(gameSheetRotationDegrees)
+        val normalizedMenuRotation = normalizeRotationForTemplateStorage(popupMenuRotationDegrees)
+
+        if (template.sheetRotationDegrees == normalizedSheetRotation &&
+            template.menuRotationDegrees == normalizedMenuRotation
+        ) {
+            return
+        }
+
+        val updatedTemplate = template.copy(
+            sheetRotationDegrees = normalizedSheetRotation,
+            menuRotationDegrees = normalizedMenuRotation
+        )
+        templateRepository.updateTemplate(updatedTemplate)
+        currentTemplate = updatedTemplate
     }
 
     private fun repositionFloatingControls(event: MotionEvent) {
@@ -331,6 +381,7 @@ class GameSheetActivity : AppCompatActivity() {
         val dialog = AlertDialog.Builder(this).setView(layout).create()
         val actionsLayout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
+            rotation = popupMenuRotationDegrees
         }
         val rotateButton = ImageButton(this).apply {
             setImageResource(R.drawable.ic_rotate_right)
@@ -342,7 +393,9 @@ class GameSheetActivity : AppCompatActivity() {
             )
             elevation = 8f * dp
             setOnClickListener {
-                actionsLayout.rotation = rotateHamburgerMenu(actionsLayout.rotation)
+                popupMenuRotationDegrees = rotateHamburgerMenu(popupMenuRotationDegrees)
+                actionsLayout.rotation = popupMenuRotationDegrees
+                persistTemplateRotations()
             }
         }
 
