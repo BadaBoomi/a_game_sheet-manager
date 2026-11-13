@@ -13,7 +13,7 @@ class AppDatabase(context: Context) :
 
     companion object {
         const val DATABASE_NAME = "game_sheet_manager.db"
-        const val DATABASE_VERSION = 2
+        const val DATABASE_VERSION = 3
 
         // Templates table
         const val TABLE_TEMPLATES = "templates"
