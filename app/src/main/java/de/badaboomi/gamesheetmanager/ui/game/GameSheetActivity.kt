@@ -404,11 +404,11 @@ class GameSheetActivity : AppCompatActivity() {
             )
             elevation = 8f * dp
             rotation = getCurrentMenuRotation(isLandscapeMenuLayout, popupMenuRotationDegrees)
-            setOnClickListener {
+            setOnClickListener { v ->
                 popupMenuRotationDegrees = rotateHamburgerMenu(popupMenuRotationDegrees)
                 val newMenuRotation = getCurrentMenuRotation(isLandscapeMenuLayout, popupMenuRotationDegrees)
                 actionsLayout.rotation = newMenuRotation
-                rotateButton.rotation = newMenuRotation
+                v.rotation = newMenuRotation
                 persistTemplateRotations()
             }
         }
