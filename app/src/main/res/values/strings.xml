@@ -116,7 +116,6 @@
     <string name="action_restart_game">Neustart</string>
     <string name="action_finish_game">Beenden</string>
     <string name="action_finish_and_save_hof">In Hall of Fame Speichern</string>
-    <string name="action_rotate_menu">Menü drehen</string>
     <string name="action_rotate_sheet">Spielbogen drehen</string>
     <string name="action_save_and_finish">Speichern und beenden</string>
     <string name="action_finish_without_save">Beenden</string>
