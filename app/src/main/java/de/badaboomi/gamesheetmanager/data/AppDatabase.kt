@@ -13,7 +13,7 @@ class AppDatabase(context: Context) :
 
     companion object {
         const val DATABASE_NAME = "game_sheet_manager.db"
-        const val DATABASE_VERSION = 1
+        const val DATABASE_VERSION = 2
 
         // Templates table
         const val TABLE_TEMPLATES = "templates"
@@ -89,5 +89,9 @@ class AppDatabase(context: Context) :
         db.execSQL("DROP TABLE IF EXISTS $TABLE_GAME_SHEETS")
         db.execSQL("DROP TABLE IF EXISTS $TABLE_HALL_OF_FAME")
         onCreate(db)
+    }
+
+    override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        onUpgrade(db, oldVersion, newVersion)
     }
 }
