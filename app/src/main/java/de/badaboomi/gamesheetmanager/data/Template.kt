@@ -7,5 +7,7 @@ data class Template(
     val id: Long = 0,
     val name: String,
     val imagePath: String,
-    val dateCreated: Long = System.currentTimeMillis()
+    val dateCreated: Long = System.currentTimeMillis(),
+    val sheetRotationDegrees: Float = 0f,
+    val menuRotationDegrees: Float = 0f
 )

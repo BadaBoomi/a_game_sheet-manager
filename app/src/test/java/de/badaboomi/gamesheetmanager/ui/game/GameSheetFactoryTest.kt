@@ -38,4 +38,12 @@ class GameSheetFactoryTest {
         assertEquals(270f, GameSheetActivity.rotateHamburgerMenu(180f), 0.01f)
         assertEquals(0f, GameSheetActivity.rotateHamburgerMenu(270f), 0.01f)
     }
+
+    @Test
+    fun `rotation normalization snaps values to persisted quarter turns`() {
+        assertEquals(0f, GameSheetActivity.normalizeRotationForTemplateStorage(359f), 0.01f)
+        assertEquals(90f, GameSheetActivity.normalizeRotationForTemplateStorage(91f), 0.01f)
+        assertEquals(180f, GameSheetActivity.normalizeRotationForTemplateStorage(-179f), 0.01f)
+        assertEquals(270f, GameSheetActivity.normalizeRotationForTemplateStorage(269f), 0.01f)
+    }
 }

@@ -26,7 +26,9 @@ class TemplateRepository(context: Context) {
                         id = it.getLong(it.getColumnIndexOrThrow(AppDatabase.COL_TEMPLATE_ID)),
                         name = it.getString(it.getColumnIndexOrThrow(AppDatabase.COL_TEMPLATE_NAME)),
                         imagePath = it.getString(it.getColumnIndexOrThrow(AppDatabase.COL_TEMPLATE_IMAGE_PATH)),
-                        dateCreated = it.getLong(it.getColumnIndexOrThrow(AppDatabase.COL_TEMPLATE_DATE_CREATED))
+                        dateCreated = it.getLong(it.getColumnIndexOrThrow(AppDatabase.COL_TEMPLATE_DATE_CREATED)),
+                        sheetRotationDegrees = it.getFloat(it.getColumnIndexOrThrow(AppDatabase.COL_TEMPLATE_SHEET_ROTATION_DEGREES)),
+                        menuRotationDegrees = it.getFloat(it.getColumnIndexOrThrow(AppDatabase.COL_TEMPLATE_MENU_ROTATION_DEGREES))
                     )
                 )
             }
@@ -48,7 +50,9 @@ class TemplateRepository(context: Context) {
                     id = it.getLong(it.getColumnIndexOrThrow(AppDatabase.COL_TEMPLATE_ID)),
                     name = it.getString(it.getColumnIndexOrThrow(AppDatabase.COL_TEMPLATE_NAME)),
                     imagePath = it.getString(it.getColumnIndexOrThrow(AppDatabase.COL_TEMPLATE_IMAGE_PATH)),
-                    dateCreated = it.getLong(it.getColumnIndexOrThrow(AppDatabase.COL_TEMPLATE_DATE_CREATED))
+                    dateCreated = it.getLong(it.getColumnIndexOrThrow(AppDatabase.COL_TEMPLATE_DATE_CREATED)),
+                    sheetRotationDegrees = it.getFloat(it.getColumnIndexOrThrow(AppDatabase.COL_TEMPLATE_SHEET_ROTATION_DEGREES)),
+                    menuRotationDegrees = it.getFloat(it.getColumnIndexOrThrow(AppDatabase.COL_TEMPLATE_MENU_ROTATION_DEGREES))
                 )
             } else null
         }
@@ -59,6 +63,8 @@ class TemplateRepository(context: Context) {
             put(AppDatabase.COL_TEMPLATE_NAME, template.name)
             put(AppDatabase.COL_TEMPLATE_IMAGE_PATH, template.imagePath)
             put(AppDatabase.COL_TEMPLATE_DATE_CREATED, template.dateCreated)
+            put(AppDatabase.COL_TEMPLATE_SHEET_ROTATION_DEGREES, template.sheetRotationDegrees)
+            put(AppDatabase.COL_TEMPLATE_MENU_ROTATION_DEGREES, template.menuRotationDegrees)
         }
         return db.writableDatabase.insert(AppDatabase.TABLE_TEMPLATES, null, values)
     }
@@ -67,6 +73,8 @@ class TemplateRepository(context: Context) {
         val values = ContentValues().apply {
             put(AppDatabase.COL_TEMPLATE_NAME, template.name)
             put(AppDatabase.COL_TEMPLATE_IMAGE_PATH, template.imagePath)
+            put(AppDatabase.COL_TEMPLATE_SHEET_ROTATION_DEGREES, template.sheetRotationDegrees)
+            put(AppDatabase.COL_TEMPLATE_MENU_ROTATION_DEGREES, template.menuRotationDegrees)
         }
         return db.writableDatabase.update(
             AppDatabase.TABLE_TEMPLATES,

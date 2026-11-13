@@ -13,7 +13,7 @@ class AppDatabase(context: Context) :
 
     companion object {
         const val DATABASE_NAME = "game_sheet_manager.db"
-        const val DATABASE_VERSION = 3
+32        const val DATABASE_VERSION = 3
 
         // Templates table
         const val TABLE_TEMPLATES = "templates"
@@ -21,6 +21,8 @@ class AppDatabase(context: Context) :
         const val COL_TEMPLATE_NAME = "name"
         const val COL_TEMPLATE_IMAGE_PATH = "image_path"
         const val COL_TEMPLATE_DATE_CREATED = "date_created"
+        const val COL_TEMPLATE_SHEET_ROTATION_DEGREES = "sheet_rotation_degrees"
+        const val COL_TEMPLATE_MENU_ROTATION_DEGREES = "menu_rotation_degrees"
 
         // GameSheets table
         const val TABLE_GAME_SHEETS = "game_sheets"
@@ -48,7 +50,9 @@ class AppDatabase(context: Context) :
                 $COL_TEMPLATE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 $COL_TEMPLATE_NAME TEXT NOT NULL,
                 $COL_TEMPLATE_IMAGE_PATH TEXT NOT NULL,
-                $COL_TEMPLATE_DATE_CREATED INTEGER NOT NULL
+                $COL_TEMPLATE_DATE_CREATED INTEGER NOT NULL,
+                $COL_TEMPLATE_SHEET_ROTATION_DEGREES REAL NOT NULL DEFAULT 0,
+                $COL_TEMPLATE_MENU_ROTATION_DEGREES REAL NOT NULL DEFAULT 0
             )
         """
 
@@ -85,10 +89,14 @@ class AppDatabase(context: Context) :
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_TEMPLATES")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_GAME_SHEETS")
-        db.execSQL("DROP TABLE IF EXISTS $TABLE_HALL_OF_FAME")
-        onCreate(db)
+        if (oldVersion < 2) {
+            db.execSQL(
+                "ALTER TABLE $TABLE_TEMPLATES ADD COLUMN $COL_TEMPLATE_SHEET_ROTATION_DEGREES REAL NOT NULL DEFAULT 0"
+            )
+            db.execSQL(
+                "ALTER TABLE $TABLE_TEMPLATES ADD COLUMN $COL_TEMPLATE_MENU_ROTATION_DEGREES REAL NOT NULL DEFAULT 0"
+            )
+        }
     }
 
     override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
