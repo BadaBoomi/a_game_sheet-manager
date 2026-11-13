@@ -26,8 +26,11 @@ class TemplateAdapter(
     private val onEditClick: (Template) -> Unit,
     private val onSendClick: (Template) -> Unit,
     private val onExportClick: (Template) -> Unit,
+    private val onToggleSelection: (Template) -> Unit,
     private val showDeleteButton: Boolean,
-    private val showStartButton: Boolean
+    private val showStartButton: Boolean,
+    private val showSelectionCheckBox: Boolean,
+    private val selectedTemplateIds: Set<Long>
 ) : BaseAdapter() {
 
     override fun getCount(): Int = templates.size
@@ -74,7 +77,18 @@ class TemplateAdapter(
         btnExport.visibility = if (showDeleteButton) View.VISIBLE else View.GONE
         btnExport.setOnClickListener { onExportClick(template) }
 
-        view.setOnClickListener { onItemClick(template) }
+        val checkbox = view.findViewById<android.widget.CheckBox>(R.id.cbTemplateSelect)
+        checkbox.visibility = if (showSelectionCheckBox) View.VISIBLE else View.GONE
+        checkbox.isChecked = selectedTemplateIds.contains(template.id)
+        checkbox.setOnClickListener { onToggleSelection(template) }
+
+        view.setOnClickListener {
+            if (showSelectionCheckBox) {
+                onToggleSelection(template)
+            } else {
+                onItemClick(template)
+            }
+        }
 
         return view
     }
