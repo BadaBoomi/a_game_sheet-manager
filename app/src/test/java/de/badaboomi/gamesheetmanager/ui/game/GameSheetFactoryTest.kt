@@ -46,4 +46,12 @@ class GameSheetFactoryTest {
         assertEquals(180f, GameSheetActivity.normalizeRotationForTemplateStorage(-179f), 0.01f)
         assertEquals(270f, GameSheetActivity.normalizeRotationForTemplateStorage(269f), 0.01f)
     }
+
+    @Test
+    fun `menu rotation combines manual popup rotation with current landscape orientation`() {
+        assertEquals(90f, GameSheetActivity.getCurrentMenuRotation(true, 0f), 0.01f)
+        assertEquals(180f, GameSheetActivity.getCurrentMenuRotation(true, 90f), 0.01f)
+        assertEquals(0f, GameSheetActivity.getCurrentMenuRotation(false, 90f), 0.01f)
+        assertEquals(270f, GameSheetActivity.getCurrentMenuRotation(false, 180f), 0.01f)
+    }
 }

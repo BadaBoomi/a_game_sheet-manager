@@ -60,6 +60,13 @@ class GameSheetActivity : AppCompatActivity() {
                 else -> 0f
             }
         }
+
+        internal fun getCurrentMenuRotation(isLandscape: Boolean, manualRotation: Float): Float {
+            val orientationRotation = getInitialHamburgerMenuRotation(isLandscape)
+            val combinedRotation = orientationRotation + manualRotation
+            val normalized = ((combinedRotation % 360f) + 360f) % 360f
+            return normalized
+        }
     }
 
     /** The three-state zoom cycle: NORMAL → ZOOM_PAN → DRAW_ZOOMED → NORMAL */
@@ -83,6 +90,7 @@ class GameSheetActivity : AppCompatActivity() {
     private var menuOrientationListener: OrientationEventListener? = null
     private var isLandscapeMenuLayout = false
     private var lastMenuLayoutSwitchAtMs: Long = 0L
+    private var floatingMenuActionsLayout: LinearLayout? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -327,6 +335,8 @@ class GameSheetActivity : AppCompatActivity() {
         binding.btnQuickUndo.rotation = iconRotation
         binding.btnRotate.rotation = iconRotation
         binding.btnMenuHandle.rotation = iconRotation
+
+        floatingMenuActionsLayout?.rotation = getCurrentMenuRotation(isLandscape, popupMenuRotationDegrees)
     }
 
     private fun rotateGameSheetClockwise() {
@@ -377,12 +387,14 @@ class GameSheetActivity : AppCompatActivity() {
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding((16 * dp).toInt(), (8 * dp).toInt(), (16 * dp).toInt(), (8 * dp).toInt())
+            rotation = popupMenuRotationDegrees
         }
         val dialog = AlertDialog.Builder(this).setView(layout).create()
         val actionsLayout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             rotation = popupMenuRotationDegrees
         }
+        floatingMenuActionsLayout = actionsLayout
         val rotateButton = ImageButton(this).apply {
             setImageResource(R.drawable.ic_rotate_right)
             setBackgroundResource(R.drawable.bg_floating_menu)
@@ -392,9 +404,12 @@ class GameSheetActivity : AppCompatActivity() {
                 resources.getColor(android.R.color.black, theme)
             )
             elevation = 8f * dp
+            rotation = popupMenuRotationDegrees
             setOnClickListener {
                 popupMenuRotationDegrees = rotateHamburgerMenu(popupMenuRotationDegrees)
+                layout.rotation = popupMenuRotationDegrees
                 actionsLayout.rotation = popupMenuRotationDegrees
+                rotateButton.rotation = popupMenuRotationDegrees
                 persistTemplateRotations()
             }
         }
