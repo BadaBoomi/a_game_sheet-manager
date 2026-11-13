@@ -387,12 +387,11 @@ class GameSheetActivity : AppCompatActivity() {
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding((16 * dp).toInt(), (8 * dp).toInt(), (16 * dp).toInt(), (8 * dp).toInt())
-            rotation = popupMenuRotationDegrees
         }
         val dialog = AlertDialog.Builder(this).setView(layout).create()
         val actionsLayout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            rotation = popupMenuRotationDegrees
+            rotation = getCurrentMenuRotation(isLandscapeMenuLayout, popupMenuRotationDegrees)
         }
         floatingMenuActionsLayout = actionsLayout
         val rotateButton = ImageButton(this).apply {
@@ -404,12 +403,12 @@ class GameSheetActivity : AppCompatActivity() {
                 resources.getColor(android.R.color.black, theme)
             )
             elevation = 8f * dp
-            rotation = popupMenuRotationDegrees
+            rotation = getCurrentMenuRotation(isLandscapeMenuLayout, popupMenuRotationDegrees)
             setOnClickListener {
                 popupMenuRotationDegrees = rotateHamburgerMenu(popupMenuRotationDegrees)
-                layout.rotation = popupMenuRotationDegrees
-                actionsLayout.rotation = popupMenuRotationDegrees
-                rotateButton.rotation = popupMenuRotationDegrees
+                val newMenuRotation = getCurrentMenuRotation(isLandscapeMenuLayout, popupMenuRotationDegrees)
+                actionsLayout.rotation = newMenuRotation
+                rotateButton.rotation = newMenuRotation
                 persistTemplateRotations()
             }
         }
