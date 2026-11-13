@@ -2,6 +2,7 @@ package de.badaboomi.gamesheetmanager.ui.game
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.app.Dialog
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
@@ -428,14 +429,16 @@ class GameSheetActivity : AppCompatActivity() {
     }
 
     private fun showColorPicker() {
-        ColorPickerDialog(
+        val dialog = ColorPickerDialog(
             context = this,
             currentColor = binding.drawingView.penColor,
             currentWidth = binding.drawingView.penWidth
         ) { color, width ->
             binding.drawingView.penColor = color
             binding.drawingView.penWidth = width
-        }.show()
+        }
+        dialog.show()
+        applyDialogRotation(dialog)
     }
 
     // ── Game actions ─────────────────────────────────────────────────────────
@@ -493,6 +496,7 @@ class GameSheetActivity : AppCompatActivity() {
             .create()
 
         dialog.show()
+        applyDialogRotation(dialog)
     }
 
     private fun finishWithoutSaving() {
@@ -508,6 +512,10 @@ class GameSheetActivity : AppCompatActivity() {
             }
             .setNegativeButton(android.R.string.cancel, null)
             .show()
+    }
+
+    private fun applyDialogRotation(dialog: Dialog) {
+        dialog.window?.decorView?.rotation = getCurrentMenuRotation(isLandscapeMenuLayout, 0f)
     }
 
     private fun saveAndFinish() {
