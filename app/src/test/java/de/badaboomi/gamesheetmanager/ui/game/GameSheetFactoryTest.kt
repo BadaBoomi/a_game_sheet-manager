@@ -48,10 +48,10 @@ class GameSheetFactoryTest {
     }
 
     @Test
-    fun `menu rotation combines manual popup rotation with current landscape orientation`() {
+    fun `menu rotation follows device orientation and ignores saved manual rotation`() {
         assertEquals(90f, GameSheetActivity.getCurrentMenuRotation(true, 0f), 0.01f)
-        assertEquals(180f, GameSheetActivity.getCurrentMenuRotation(true, 90f), 0.01f)
+        assertEquals(90f, GameSheetActivity.getCurrentMenuRotation(true, 90f), 0.01f)
         assertEquals(0f, GameSheetActivity.getCurrentMenuRotation(false, 90f), 0.01f)
-        assertEquals(270f, GameSheetActivity.getCurrentMenuRotation(false, 180f), 0.01f)
+        assertEquals(0f, GameSheetActivity.getCurrentMenuRotation(false, 180f), 0.01f)
     }
 }

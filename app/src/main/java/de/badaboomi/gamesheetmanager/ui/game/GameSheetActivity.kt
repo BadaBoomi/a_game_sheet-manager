@@ -11,8 +11,7 @@ import android.view.MotionEvent
 import android.view.OrientationEventListener
 import android.view.View
 import android.view.ViewGroup
-import android.widget.GridLayout
-import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -62,10 +61,7 @@ class GameSheetActivity : AppCompatActivity() {
         }
 
         internal fun getCurrentMenuRotation(isLandscape: Boolean, manualRotation: Float): Float {
-            val orientationRotation = getInitialHamburgerMenuRotation(isLandscape)
-            val combinedRotation = orientationRotation + manualRotation
-            val normalized = ((combinedRotation % 360f) + 360f) % 360f
-            return normalized
+            return getInitialHamburgerMenuRotation(isLandscape)
         }
     }
 
@@ -86,7 +82,6 @@ class GameSheetActivity : AppCompatActivity() {
     private var zoomState = ZoomState.NORMAL
     private var templateBitmapCache: Bitmap? = null
     private var gameSheetRotationDegrees = 0f
-    private var popupMenuRotationDegrees = 0f
     private var menuOrientationListener: OrientationEventListener? = null
     private var isLandscapeMenuLayout = false
     private var lastMenuLayoutSwitchAtMs: Long = 0L
@@ -145,9 +140,6 @@ class GameSheetActivity : AppCompatActivity() {
 
         gameSheetRotationDegrees = normalizeRotationForTemplateStorage(
             currentTemplate?.sheetRotationDegrees ?: 0f
-        )
-        popupMenuRotationDegrees = normalizeRotationForTemplateStorage(
-            currentTemplate?.menuRotationDegrees ?: 0f
         )
         applyGameSheetRotation()
     }
@@ -328,15 +320,23 @@ class GameSheetActivity : AppCompatActivity() {
     }
 
     private fun applyFloatingControlsOrientation(isLandscape: Boolean) {
-        // Keep the 2x2 square and current position untouched.
-        // Only rotate icon orientation in landscape.
         val iconRotation = getInitialHamburgerMenuRotation(isLandscape)
         binding.btnZoom.rotation = iconRotation
         binding.btnQuickUndo.rotation = iconRotation
-        binding.btnRotate.rotation = iconRotation
         binding.btnMenuHandle.rotation = iconRotation
 
-        floatingMenuActionsLayout?.rotation = getCurrentMenuRotation(isLandscape, popupMenuRotationDegrees)
+        floatingMenuActionsLayout?.rotation = getCurrentMenuRotation(isLandscape, 0f)
+    }
+
+    private fun applyGameSheetRotation() {
+        binding.ivTemplateBackground.rotation = gameSheetRotationDegrees
+        binding.drawingView.rotation = gameSheetRotationDegrees
+        val shouldUsePortraitFit = kotlin.math.abs(gameSheetRotationDegrees % 180f) < 45f
+        binding.ivTemplateBackground.scaleType = if (shouldUsePortraitFit) {
+            ImageView.ScaleType.FIT_CENTER
+        } else {
+            ImageView.ScaleType.CENTER_CROP
+        }
     }
 
     private fun rotateGameSheetClockwise() {
@@ -345,25 +345,17 @@ class GameSheetActivity : AppCompatActivity() {
         persistTemplateRotations()
     }
 
-    private fun applyGameSheetRotation() {
-        binding.ivTemplateBackground.rotation = gameSheetRotationDegrees
-        binding.drawingView.rotation = gameSheetRotationDegrees
-    }
-
     private fun persistTemplateRotations() {
         val template = currentTemplate ?: return
         val normalizedSheetRotation = normalizeRotationForTemplateStorage(gameSheetRotationDegrees)
-        val normalizedMenuRotation = normalizeRotationForTemplateStorage(popupMenuRotationDegrees)
 
-        if (template.sheetRotationDegrees == normalizedSheetRotation &&
-            template.menuRotationDegrees == normalizedMenuRotation
-        ) {
+        if (template.sheetRotationDegrees == normalizedSheetRotation) {
             return
         }
 
         val updatedTemplate = template.copy(
             sheetRotationDegrees = normalizedSheetRotation,
-            menuRotationDegrees = normalizedMenuRotation
+            menuRotationDegrees = 0f
         )
         templateRepository.updateTemplate(updatedTemplate)
         currentTemplate = updatedTemplate
@@ -391,35 +383,9 @@ class GameSheetActivity : AppCompatActivity() {
         val dialog = AlertDialog.Builder(this).setView(layout).create()
         val actionsLayout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            rotation = getCurrentMenuRotation(isLandscapeMenuLayout, popupMenuRotationDegrees)
+            rotation = getCurrentMenuRotation(isLandscapeMenuLayout, 0f)
         }
         floatingMenuActionsLayout = actionsLayout
-        val rotateButton = ImageButton(this).apply {
-            setImageResource(R.drawable.ic_rotate_right)
-            setBackgroundResource(R.drawable.bg_floating_menu)
-            contentDescription = getString(R.string.action_rotate_menu)
-            setPadding((8 * dp).toInt(), (8 * dp).toInt(), (8 * dp).toInt(), (8 * dp).toInt())
-            imageTintList = android.content.res.ColorStateList.valueOf(
-                resources.getColor(android.R.color.black, theme)
-            )
-            elevation = 8f * dp
-            rotation = getCurrentMenuRotation(isLandscapeMenuLayout, popupMenuRotationDegrees)
-            setOnClickListener {
-                popupMenuRotationDegrees = rotateHamburgerMenu(popupMenuRotationDegrees)
-                val newMenuRotation = getCurrentMenuRotation(isLandscapeMenuLayout, popupMenuRotationDegrees)
-                actionsLayout.rotation = newMenuRotation
-                rotateButton.rotation = newMenuRotation
-                persistTemplateRotations()
-            }
-        }
-
-        rotateButton.layoutParams = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.WRAP_CONTENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        ).apply {
-            gravity = android.view.Gravity.END
-        }
-        layout.addView(rotateButton)
 
         actionsLayout.layoutParams = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
