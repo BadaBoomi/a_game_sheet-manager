@@ -343,22 +343,6 @@ class TemplateListActivity : AppCompatActivity() {
         shareExportedArchive(exported, template.name)
     }
 
-    private fun exportSelectedTemplates() {
-        if (templates.isEmpty()) {
-            Toast.makeText(this, R.string.msg_template_export_selection_error, Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val exportDir = File(cacheDir, "exports").apply { mkdirs() }
-        val file = File(exportDir, "templates_export_${System.currentTimeMillis()}.zip")
-        val exported = TemplateExportUtils.createArchive(file, templates)
-        if (exported == null) {
-            Toast.makeText(this, R.string.msg_template_export_error, Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        shareExportedArchive(exported, getString(R.string.title_templates))
-    }
 
     private fun shareExportedArchive(exportedFile: File, displayName: String) {
         val uri = FileProvider.getUriForFile(
